@@ -34,8 +34,15 @@ html,body{
   font-size: 14px;
 }
 #app{
-  display: flex;
   height: 100%;
   width: 100%;
   user-select: none;
+  background: linear-gradient( 180deg, #008A72 0%, #00B371 100%);
+}
+
+
+.ellipsis{    
+    overflow: hidden;    
+    text-overflow: ellipsis;    
+    white-space: nowrap;
 }

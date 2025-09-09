@@ -109,16 +109,16 @@ function createTray(){
   // 实例化一个 托盘对象，传入的是托盘的图标
   const  tray = new Tray(icon)
   // 移动到托盘上的提示
-  tray.setToolTip('FSSE教育质量监测评估')
+  tray.setToolTip('课堂评价系统')
   // 还可以设置 titlle
-  tray.setTitle('FSSE教育质量监测评估')
+  tray.setTitle('课堂评价系统')
 
   // 监听托盘右键事件
   tray.on('right-click', () => {
     // 右键菜单模板
     const tempate = [
       {
-        label: '打开FSSE',
+        label: '打开课堂评价',
       },
       {
         label: '退出',

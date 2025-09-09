@@ -1,21 +1,19 @@
-<!--
- * @Descripttion: 
- * @version: 1.0.0
- * @Author: lai_hq@qq.com
- * @Date: 2022-12-12 15:58:44
- * @LastEditors: lai_hq@qq.com
- * @LastEditTime: 2023-08-23 22:15:46
--->
-
-
 <template>
+  <a-config-provider
+    :theme="{
+      token: {
+        colorPrimary: '#00B781',
+      },
+    }"
+  >
     <router-view />
+  </a-config-provider>
 </template>
 
 <script setup lang="ts">
-import { version } from '../../package.json'
+// import { version } from '../../package.json'
 
-console.log(version)
+// console.log(version)
 // import { onMounted, reactive } from 'vue'
 
 // // import mac from 'getmac'
@@ -38,4 +36,7 @@ console.log(version)
 </script>
 
 <style scoped>
+
+
+
 </style>

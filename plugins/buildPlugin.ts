@@ -105,8 +105,8 @@ class BuildObj {
         },
         files: ["**"],
         extends: null,
-        productName: "fsse", //项目名，也是生成的安装文件名，即aDemo.exe
-        appId: "com.fsse.desktop",
+        productName: "ydevaluation", //项目名，也是生成的安装文件名，即aDemo.exe
+        appId: "com.ydevaluation.desktop",
         copyright: "Copyright © 2022", //版权信息
         asar: true,
         win: {
@@ -129,7 +129,7 @@ class BuildObj {
           allowToChangeInstallationDirectory: true, //用户可以选择路径
           createDesktopShortcut: true,
           createStartMenuShortcut: true,
-          shortcutName: "fsseDesktop",
+          shortcutName: "ydevaluationDesktop",
         },
         publish: [
           // 这个路径指向你的新版本安装包所在的服务器目录

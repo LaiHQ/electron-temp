@@ -1,28 +1,9 @@
-<!--
- * @Descripttion: 
- * @version: 1.0.0
- * @Author: lai_hq@qq.com
- * @Date: 2022-12-13 10:43:48
- * @LastEditors: lai_hq@qq.com
- * @LastEditTime: 2022-12-13 11:30:20
--->
 <template>
     <div class="topBar">
-        <div class="winTitle">{{ title }}</div>
-        <div class="search">
-            <div class="search_icon"><i class="iconfont icon-sousuo"></i></div>
-            <div class="input" contenteditable="true" placeholder="搜索（Ctrl+K）"></div>
+        <div class="winTitle">
+            <slot name="title">{{ title }}</slot>
         </div>
-        <div class="winTool">
-            <div title="换肤">
-                <i class="iconfont icon-pifu" />
-            </div>
-            <div title="置顶" @click="topping">
-                <i class="iconfont icon-dingzi" :class="isTop && 'isTop'"/>
-            </div>
-            <div title="更多">
-                <i class="iconfont icon-more_light" />
-            </div>
+        <div class="winTool">            
             <div @click="minimizeMainWindow" title="最小化">
                 <i class="iconfont icon-zuixiaohua" />
             </div>           
@@ -92,18 +73,19 @@ onUnmounted(() => {
         display: flex;        
         justify-content: space-between;
         align-items: center;
-        height: 50px;
-        line-height: 50px;
+        height: 53px;
+        line-height: 53px;
         -webkit-app-region: drag;
         width: 100%;
-        border-bottom: 1px solid #e6e6e6;
-        background: #3BA39C;
+        // border-bottom: 1px solid #e6e6e6;       
     }
     .winTitle {
         // flex: 1;
-        padding-left: 12px;
-        font-size: 14px;
-        color: #fff;
+        padding-left: 20px;
+        // font-size: 14px;
+        // color: #fff;
+        display: flex;
+        align-items: center;
     }
     .search{
         background: rgba(0, 0,0,.08);
@@ -147,6 +129,7 @@ onUnmounted(() => {
         height: 100%;
         display: flex;
         -webkit-app-region: no-drag;
+        padding-right: 12px;
     }
     .winTool div {
         height: 100%;
@@ -182,7 +165,7 @@ onUnmounted(() => {
 
     }
     .winTool div:last-child:hover {
-        background: #ff7875;
+        // background: #ff7875;
     }
     .winTool div:last-child:hover i {
         color: #fff !important;
