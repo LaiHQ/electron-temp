@@ -3,7 +3,10 @@
         <div class="winTitle">
             <slot name="title">{{ title }}</slot>
         </div>
-        <div class="winTool">            
+        <div class="winTool">
+            <slot name="right">
+
+            </slot>            
             <div @click="minimizeMainWindow" title="最小化">
                 <i class="iconfont icon-zuixiaohua" />
             </div>           

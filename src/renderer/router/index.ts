@@ -2,7 +2,7 @@ import {createRouter,createWebHistory} from "vue-router";
 
 
 const routes = [
-    { path: "/", redirect: "/windowMain/home" },
+    { path: "/", redirect: "/windowMain/login" },
     {
         path: "/windowMain",
         component: () => import("../window/main/index.vue"),
@@ -18,7 +18,7 @@ const routes = [
         children: [
             { path: "accountSetting", component: () => import("../window/setting/accountSetting.vue") }
         ],
-      },     
+      },
 ]
 
 

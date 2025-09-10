@@ -84,7 +84,7 @@
                                     </div>
                                 </div>
                                 <!--  -->
-                                <a-button type="primary" style="width: 100%;">登录</a-button>
+                                <a-button type="primary" style="width: 100%;" @click="handleLogin">登录</a-button>
                                 <a-button type="link" style="margin-left: -15px;margin-top: 5px;" @click="handleBack">返回</a-button>
                             </div>
                         </div>
@@ -99,11 +99,16 @@
 import { reactive, onMounted,ref } from 'vue'
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import 'swiper/css';
+import { useRouter } from 'vue-router'
 
 
 import BarTop from '../../../components/BarTop/index.vue'
+
+
 // import { version } from '../../../../../package.json'
 // console.log(version)
+
+const router = useRouter()
 
 const formState = reactive({
     username: '',
@@ -111,12 +116,20 @@ const formState = reactive({
 })
 
 const state = reactive({
-    step: 2,
+    step: 1,
     loginType: 'pwd', // pwd | qrcode
     qrcode: '2323232'
 })
 
 let instanceSwiper = null
+
+function handleLogin(){
+    // state.step = 
+
+    router.push('/windowMain/home')
+
+}
+
 const onSwiper = (swiper) => {
     instanceSwiper = swiper;
 };
