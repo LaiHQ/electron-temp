@@ -93,3 +93,6 @@ vite.config.ts 是 Vite 的配置文件。
 
 ## 自定义安装
 [NSIS-UI](https://github.com/hilanmiao/NSIS-UI)
+
+
+https://lanhuapp.com/web/#/item/project/detailDetach?pid=7828b66f-97dc-4172-be9d-45e5cca0239c&project_id=7828b66f-97dc-4172-be9d-45e5cca0239c&image_id=5940c6b1-3718-4329-bd7d-faef1c3e11e3&fromEditor=true

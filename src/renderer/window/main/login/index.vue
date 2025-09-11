@@ -30,7 +30,7 @@
                                     <a-input-password v-model:value="formState.password" placeholder="请输入密码" />
                                 </a-form-item>
                                 <a-form-item>
-                                    <a-button type="primary" html-type="submit" style="width: 100%;margin-top: 16px;">登录</a-button>
+                                    <a-button :loading="state.loading" type="primary" html-type="submit" style="width: 100%;margin-top: 16px;">登录</a-button>
                                 </a-form-item>
                             </a-form>
                         </div>
@@ -61,8 +61,8 @@
                                     <swiper class="swiper-container" :slides-per-view="3" :space-between="20"
                                         :centered-slides="true"  @slideChange="onSlideChange"
                                         @swiper="onSwiper" navigation :scrollbar="{ draggable: true }">
-                                        <swiper-slide @click="instanceSwiper?.slideToLoop(idx)" class="swiper-slide" v-for="(item,idx) in 5" :key="idx" v-slot="{ isActive }">
-                                            <img src="../../../assets/login-bg.png" :style="{
+                                        <swiper-slide @click="instanceSwiper?.slideToLoop(idx)" class="swiper-slide" v-for="(item,idx) in state.schoolList" :key="idx" v-slot="{ isActive }">
+                                            <img :src="item.schoolLogo" :style="{
                                                 width: '55px',
                                                 height: '55px',
                                                 borderRadius: '50%',
@@ -71,7 +71,7 @@
                                             <span :style="{
                                                 'padding-top':'7px',
                                                 'color':isActive ? '#000000' :'#8C8C8C'
-                                            }" class="ellipsis school-name">北京大学{{ idx }}</span>
+                                            }" class="ellipsis school-name">{{ item.schoolName }}</span>
                                         </swiper-slide>
                                     </swiper>
                                     <!--  -->
@@ -84,7 +84,7 @@
                                     </div>
                                 </div>
                                 <!--  -->
-                                <a-button type="primary" style="width: 100%;" @click="handleLogin">登录</a-button>
+                                <a-button type="primary" style="width: 100%;" :loading="state.loadingSchool" @click="handleLogin">登录</a-button>
                                 <a-button type="link" style="margin-left: -15px;margin-top: 5px;" @click="handleBack">返回</a-button>
                             </div>
                         </div>
@@ -100,23 +100,31 @@ import { reactive, onMounted,ref } from 'vue'
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import 'swiper/css';
 import { useRouter } from 'vue-router'
-
-
 import BarTop from '../../../components/BarTop/index.vue'
-
+import http from "../../../utils/http"
+import {useUserInfoStore} from "../../../store/useStore"
 
 // import { version } from '../../../../../package.json'
 // console.log(version)
 
+const userInfo = useUserInfoStore()
 const router = useRouter()
 
 const formState = reactive({
-    username: '',
-    password: '',
+    username: '14788880091',
+    password: '123456t.',
+    grant_type: 'password',
+    client_id: 'yide-eac-windows',
+    client_secret: 'yide1234567',
 })
 
 const state = reactive({
     step: 1,
+    loading: false,
+    loadingSchool:false,
+    user:{},
+    schoolList: [],
+    current:0,
     loginType: 'pwd', // pwd | qrcode
     qrcode: '2323232'
 })
@@ -124,16 +132,24 @@ const state = reactive({
 let instanceSwiper = null
 
 function handleLogin(){
-    // state.step = 
-
-    router.push('/windowMain/home')
-
+    const school = state.schoolList[state.current]
+    state.loadingSchool = true
+    if(school){
+        http.get(`/cloud/menu/checkUserLogin?schoolId=${school.id}`).then(()=>{
+            userInfo.setupUserInfo(state.user)
+            router.push('/windowMain/home')
+            state.step = 1
+        }).finally(()=>{
+            state.loadingSchool = false
+        })
+    } 
 }
 
 const onSwiper = (swiper) => {
     instanceSwiper = swiper;
 };
 const onSlideChange = (e) => {
+    state.current = e.activeIndex
     console.log('slide change',e.activeIndex);
 };
 function changeSchool(type){
@@ -157,7 +173,42 @@ function changeLoginType() {
 }
 
 const onFinish = (values) => {
-    console.log('Success:', values);
+    state.loading = true
+    http.postForm('/auth/oauth/token', formState).then(async (res) => {
+        const { accessToken, refreshToken } = res.data
+
+        localStorage.setItem('token', accessToken)
+        localStorage.setItem('refresh_token', refreshToken)
+
+        try {
+            const userData = await http.get('/cloud/user/getCurrentUser')
+            const user = userData.data
+            state.loading = false
+            state.step = 2
+            state.schoolList = user.school;
+            state.user = user
+            // if(user.school.length > 1){
+            //     state.schoolList = user.school;
+            //     return;
+            // }else{
+            //     // 
+            // }
+        } catch (error) {
+            localStorage.removeItem('token')
+            localStorage.removeItem('refresh_token')
+        }
+
+        
+
+
+       
+
+
+    }).catch((error) => {
+        console.error('Login failed:', error);
+    }).finally(() => {
+        state.loading = false
+    })
 };
 
 const onFinishFailed = (errorInfo) => {

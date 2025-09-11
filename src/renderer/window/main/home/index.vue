@@ -8,19 +8,13 @@
                 <div style="display: flex;align-items: center;">                   
                     <a-dropdown placement="bottom" :arrow="{ pointAtCenter: true }">
                         <div class="current_class">
-                           <span class="current_class__name ">三年级2班</span>
+                           <span class="current_class__name ellipsis">{{selectClass?.showName || selectClass?.name}}</span>
                             <div class="switch_class"></div>
                         </div>                        
                         <template #overlay>
-                            <a-menu>
-                                <a-menu-item>
-                                <a href="javascript:;">1st menu item</a>
-                                </a-menu-item>
-                                <a-menu-item>
-                                <a href="javascript:;">2nd menu item</a>
-                                </a-menu-item>
-                                <a-menu-item>
-                                <a href="javascript:;">3rd menu item</a>
+                            <a-menu @click="handleSelectClass">
+                                <a-menu-item :key="item.id" v-for="(item, idx) in classMaterList">
+                                    <a href="javascript:;">{{ item.showName || item.name }}</a>
                                 </a-menu-item>
                             </a-menu>
                         </template>
@@ -28,19 +22,19 @@
 
                     <a-dropdown placement="bottom" :arrow="{ pointAtCenter: true }">
                         <div class="current_class" style="margin-right: 30px;">
-                           <a-avatar size="36" src="https://www.antdv.com/assets/logo.1ef800a8.svg" />
-                           <CaretDownOutlined style="color: #fff;"/>
+                           <a-avatar size="36" :src="user.avatar" />
+                           <CaretDownOutlined style="color: #fff;margin-left: 3px;"/>
                         </div>
                         <template #overlay>
-                            <a-menu>
-                                <a-menu-item>
+                            <a-menu  @click="handleUserClick">
+                                <a-menu-item key="1"> 
                                     <a href="javascript:;">
-                                        张三
+                                        {{user.name}}
                                         <br/>
-                                        <span>18320782675</span>
+                                        <span>{{user.phone}}</span>
                                     </a>
-                                </a-menu-item>                               
-                                <a-menu-item>
+                                </a-menu-item>
+                                <a-menu-item key="2">
                                     <a href="javascript:;">退出登录</a>
                                 </a-menu-item>
                             </a-menu>
@@ -65,9 +59,9 @@
                                     <CheckOutlined style="color:#fff;font-size: 10px;"/>
                                 </div>
                                 <div class="item_content__bg">
-                                    <span>{{ idx }}枚</span>
+                                    <span>{{ item.medalCount || 0 }}枚</span>
                                 </div>
-                                <div class="ellipsis item_name">李小雨</div>
+                                <div class="ellipsis item_name">{{item.name}}</div>
                             </div>
                         </div>
                     </div>
@@ -76,16 +70,16 @@
                         <div class="select_desc">已选择3位同学，快给他们发送勋章吧～</div>
                         
                         <div class="list_item__box" :style="{height: (state.clientHeight - 80) + 'px'}">
-                            <div class="list_item" v-for="(item, idx) in state.dataList" :key="idx">
+                            <div class="list_item" v-for="(item, idx) in state.evalMedalList" :key="idx">
                                 <!-- active -->
                                 <div class="item_content">
                                     <div class="item_content__active">
                                         <CheckOutlined style="color:#fff;font-size: 10px;"/>
                                     </div>
                                     <div class="item_img">
-                                        <img src="" alt="">
+                                        <img :src="item.medalIconUrl" alt="">
                                     </div>
-                                    <div class="ellipsis item_name">完成{{idx}}次评价</div>
+                                    <div class="ellipsis item_name">{{item.medalName}}</div>
                                 </div>
                             </div>
                         </div>
@@ -101,23 +95,98 @@
     </div>
 </template>
 
-<script setup lang="ts">
-import {nextTick, onMounted, reactive, ref} from "vue"
+<script setup>
+import {nextTick, onMounted, reactive, ref,createVNode, computed,watch} from "vue"
 import {CheckOutlined ,CaretDownOutlined} from "@ant-design/icons-vue"
 import BarTop from '../../../components/BarTop/index.vue'
-import { open, stat } from "original-fs"
+import router from "../../../router"
+import { Modal,message } from 'ant-design-vue';
+import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
 
-const dataListRef = ref<HTMLElement | null>(null)
+import {useUserInfoStore} from "../../../store/useStore"
+import http from "../../../utils/http";
+const userInfo = useUserInfoStore()
+const user = computed(()=> userInfo.getUser)
+const classMaterList = computed(()=> userInfo.getClassMaterList)
+const selectClass =  computed(()=>userInfo.getCurrentClass)
+
+const dataListRef = ref(null)
 const state = reactive({
     updateKey: 0,
     dataList: [],
-    clientHeight:544
+    clientHeight:544,
+    evalMedalList:[]
 })
+
+// https://app.apifox.com/project/2934512
 
 function openRanking(){
     console.log('openRanking');
 }
 
+function getPageEvalMedal(){
+    http.post('/cloud/evalMedal/pageEvalMedal',{
+        issuanceMethod: 2,
+        medalList: [],
+        medalStatus: 1,
+        pageNo: 1,
+        pageSize: 999
+    }).then(res=>{
+        const {list }  =  res.data
+        state.evalMedalList = list
+    })
+}
+
+
+function getAllStudents(){
+    http.post(`/cloud/student/allStudents`,{
+        id:selectClass.value.id,
+        type:'4',
+        key:'',
+        queryMedal:true,
+        pageNo:1,
+        pageSize:10
+    }).then(res=>{
+        console.log('res',res)
+        state.dataList = res.data
+    }).finally(()=>{
+        
+    })
+}
+
+function handleSelectClass(e){
+    // console.log(e.key);
+    userInfo.changeCLass(e.key)
+    getAllStudents()
+}
+
+
+function handleUserClick(e){
+    if(e.key === '2'){
+        Modal.confirm({
+            title: '温馨提示',
+            icon: createVNode(ExclamationCircleOutlined),
+            content: createVNode('div', { style: 'color:red;' }, '确定退出登录吗?'),
+            cancelText: '取消',
+            okText: '确定',
+            onOk() {
+                // 退出登录
+                localStorage.removeItem('token')
+                localStorage.removeItem('refresh_token')
+                router.push('/windowMain/login')
+                message.success('安全退出')
+            },
+            onCancel() {
+                
+            }
+        });
+    }
+}
+watch(()=>selectClass.value?.id,()=>{
+    // 获取学生
+    getAllStudents()
+    //
+})
 
 
 onMounted(() => {
@@ -126,18 +195,20 @@ onMounted(() => {
     }
 
     window.addEventListener('resize', () => {
-        state.dataList = []
+       const arr = [...state.dataList]
+       state.dataList = []
        state.clientHeight = 0
-       state.updateKey++       
+       state.updateKey++
        nextTick(()=>{
-           state.clientHeight = dataListRef.value?.clientHeight       
-           
-            state.dataList =  Array.from({ length: 50 }, (_, i) => i + 1)
+           state.clientHeight = dataListRef.value?.clientHeight           
+            state.dataList =  arr
        })
     })
 
     nextTick(()=>{
-        state.dataList =  Array.from({ length: 50 }, (_, i) => i + 1)
+        userInfo.queryClassMaterList()
+        
+        getPageEvalMedal()
     })
     
 })
@@ -163,9 +234,10 @@ onMounted(() => {
         cursor: pointer;
         height: 25px;
         .current_class__name{
-            font-size: 16px;
+            font-size: 14px;
             color: #FFFFFF;
             line-height: 54px;
+            max-width: 240px;
         }
 
         .switch_class{

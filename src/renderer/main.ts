@@ -5,8 +5,7 @@ import { createPinia } from "pinia";
 
 import './assets/style.css'
 
-import Antd, { message } from 'ant-design-vue'
-
+import Antd from 'ant-design-vue'
 
 // import { db } from "../common/db";
 
@@ -21,7 +20,7 @@ const pinia = createPinia()
 // }
 
 const app = createApp(App)
-app.config.globalProperties.$message = message
+// app.config.globalProperties.$message = message
 
 app.use(Antd)
 app.use(pinia).use(router).mount('#app')
