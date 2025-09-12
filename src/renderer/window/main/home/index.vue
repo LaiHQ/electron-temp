@@ -14,7 +14,7 @@
                         <template #overlay>
                             <a-menu @click="handleSelectClass">
                                 <a-menu-item :key="item.id" v-for="(item, idx) in classMaterList">
-                                    <a href="javascript:;">{{ item.showName || item.name }}</a>
+                                    <a href="javascript:;" :style="{color:item.id ==selectClass.id ? '#00B781' :'' }">{{ item.showName || item.name }}</a>
                                 </a-menu-item>
                             </a-menu>
                         </template>
@@ -22,7 +22,12 @@
 
                     <a-dropdown placement="bottom" :arrow="{ pointAtCenter: true }">
                         <div class="current_class" style="margin-right: 30px;">
-                           <a-avatar size="36" :src="user.avatar" />
+                           <a-avatar size="36" v-if="user.avatar" :src="user.avatar" />
+                           <a-avatar size="36" v-else style="background: none;">
+                                <template #icon>
+                                    <img src="../../../assets/pic-head.png"  alt="">
+                                </template>
+                           </a-avatar>
                            <CaretDownOutlined style="color: #fff;margin-left: 3px;"/>
                         </div>
                         <template #overlay>
@@ -51,44 +56,90 @@
                 </div>
                 <!--  -->
                 <div class="list_warper" ref="dataListRef" :key="state.updateKey">
-                    <div class="list_item__warper"  :style="{height: state.clientHeight + 'px'}">
-                        <div class="list_item" v-for="(item, idx) in state.dataList" :key="idx">
-                            <!-- active -->
-                            <div class="item_content">
-                                <div class="item_content__active">
-                                    <CheckOutlined style="color:#fff;font-size: 10px;"/>
+                    
+                        <div class="list_item__warper"  :style="{height: state.clientHeight + 'px'}">
+                            <a-spin :spinning="spinningStudent">
+                                <div class="list_item" :style="{
+                                        width:`${state.clientWidth > 1200 ? 20 : 25 }%`
+                                    }" v-for="(item, idx) in state.dataList" :key="idx" @click="handleSelectStudent(item)">                            
+                                    <div class="item_content" :class="{
+                                        active:state.checkedStudentList.includes(item.id)
+                                    }">
+                                        <div class="item_content__active">
+                                            <CheckOutlined style="color:#fff;font-size: 10px;"/>
+                                        </div>
+                                        <div class="item_content__bg">
+                                            <span>{{ item.medalCount || 0 }}枚</span>
+                                        </div>
+                                        <div class="ellipsis item_name">{{item.name}}</div>
+                                    </div>
                                 </div>
-                                <div class="item_content__bg">
-                                    <span>{{ item.medalCount || 0 }}枚</span>
-                                </div>
-                                <div class="ellipsis item_name">{{item.name}}</div>
-                            </div>
+                                <!--  -->
+                                <a-empty                                    
+                                    :image-style="{
+                                        height: '160px',                                        
+                                        marginTop:'100px'
+                                    }"
+                                    v-if="state.dataList.length==0 && !spinningStudent"
+                                >   
+                                     <template #image>
+                                        <img src="../../../assets/empty.png" alt="">
+                                     </template>
+                                    <template #description>
+                                        <span>
+                                            暂无数据！
+                                            <a href="javascript:;" @click="getAllStudents">重新加载</a>
+                                        </span>
+                                        </template>
+                                </a-empty>
+                            </a-spin>
                         </div>
-                    </div>
+                    
                     <!--  -->
                     <div class="list_item__warper">
-                        <div class="select_desc">已选择3位同学，快给他们发送勋章吧～</div>
-                        
-                        <div class="list_item__box" :style="{height: (state.clientHeight - 80) + 'px'}">
-                            <div class="list_item" v-for="(item, idx) in state.evalMedalList" :key="idx">
-                                <!-- active -->
-                                <div class="item_content">
-                                    <div class="item_content__active">
-                                        <CheckOutlined style="color:#fff;font-size: 10px;"/>
+                        <a-spin :spinning="spinningMedal">
+                            <div class="select_desc">已选择 <span style="font-size: 16px;">{{ state.checkedStudentList.length }}</span> 位同学，快给他们发送勋章吧～</div>                        
+                            <div class="list_item__box" :style="{height: (state.clientHeight - 80) + 'px'}">
+                                <div class="list_item" :style="{
+                                    width:`${state.clientWidth > 1200 ? 20 : 25 }%`
+                                }" v-for="(item, idx) in state.evalMedalList" :key="idx" @click="handleSelectMedal(item)">
+                                    <!--  -->
+                                    <div class="item_content" :class="{
+                                            active:state.checkedMedalList.includes(item.id)
+                                        }">
+                                        <div class="item_content__active">
+                                            <CheckOutlined style="color:#fff;font-size: 10px;"/>
+                                        </div>
+                                        <div class="item_img">
+                                            <img :src="item.medalIconUrl" alt="">
+                                        </div>
+                                        <div class="ellipsis item_name">{{item.medalName}}</div>
                                     </div>
-                                    <div class="item_img">
-                                        <img :src="item.medalIconUrl" alt="">
-                                    </div>
-                                    <div class="ellipsis item_name">{{item.medalName}}</div>
                                 </div>
+                                <a-empty                                    
+                                    :image-style="{
+                                        height: '160px',                                        
+                                        marginTop:'100px'
+                                    }"
+                                    v-if="state.evalMedalList.length==0 && !spinningMedal"
+                                >   
+                                     <template #image>
+                                        <img src="../../../assets/empty.png" alt="">
+                                     </template>
+                                    <template #description>
+                                        <span>
+                                            暂无数据！
+                                            <a href="javascript:;" @click="getPageEvalMedal">重新加载</a>
+                                        </span>
+                                        </template>
+                                </a-empty>
                             </div>
-                        </div>
-
-                        <div style="padding-top: 10px;text-align: center;">
-                            <a-button type="primary" style="border-radius: 16px;width: 160px;background-color: #00C777;">确定发放</a-button>
-                        </div>
+                            
+                            <div style="padding-top: 10px;text-align: center;">
+                                <a-button @click="submit" :disabled="!(state.checkedStudentList.length > 0 && state.checkedMedalList.length>0)" :loading="subLoading" type="primary" style="border-radius: 16px;width: 160px;">确定发放</a-button>
+                            </div>
+                        </a-spin>
                     </div>                    
-                    
                 </div>
             </div>
         </div>
@@ -111,11 +162,18 @@ const classMaterList = computed(()=> userInfo.getClassMaterList)
 const selectClass =  computed(()=>userInfo.getCurrentClass)
 
 const dataListRef = ref(null)
+const spinningStudent = ref(true)
+const spinningMedal = ref(true)
+const subLoading = ref(false)
 const state = reactive({
     updateKey: 0,
     dataList: [],
     clientHeight:544,
-    evalMedalList:[]
+    clientWidth:1000,
+    evalMedalList:[],
+    checkedStudentList:[],
+    checkedMedalList:[],
+
 })
 
 // https://app.apifox.com/project/2934512
@@ -124,7 +182,58 @@ function openRanking(){
     console.log('openRanking');
 }
 
+function submit(){
+    subLoading.value = true
+    const personListDTO = state.dataList.filter(i=> state.checkedStudentList.includes(i.id)).map(i=>{
+        return {
+            id:i.id,
+            name:i.name,
+            identity:0,
+            typeValue:'student'
+        }
+    })
+    const medalCodeList = state.evalMedalList.filter(i=> state.checkedMedalList.includes(i.id)).map(i=>i.medalCode)
+    const p = {
+        medalCodeList,
+        personListDTO
+    }
+    http.post(`/app/appEvalMedal/person/issuanceMedal`,p).then(res=>{
+        
+        if(res.data){
+            state.checkedStudentList = []
+            state.checkedMedalList = []
+            getAllStudents()
+        }
+
+        message.success(res.message)
+    }).finally(()=>{
+        subLoading.value = false
+    })
+}
+
+
+
+function handleSelectStudent({id}){
+    const idx = state.checkedStudentList.findIndex(i=>id==i)
+    if(idx>=0){
+        state.checkedStudentList.splice(idx,1)
+    }else{
+        state.checkedStudentList.push(id)
+    }
+}
+
+function handleSelectMedal({id}){
+    const idx = state.checkedMedalList.findIndex(i=>id==i)
+    if(idx>=0){
+        state.checkedMedalList.splice(idx,1)
+    }else{
+        state.checkedMedalList.push(id)
+    }
+}
+
+
 function getPageEvalMedal(){
+    spinningMedal.value = true
     http.post('/cloud/evalMedal/pageEvalMedal',{
         issuanceMethod: 2,
         medalList: [],
@@ -132,13 +241,16 @@ function getPageEvalMedal(){
         pageNo: 1,
         pageSize: 999
     }).then(res=>{
-        const {list }  =  res.data
+        const { list }  =  res.data
         state.evalMedalList = list
+    }).finally(()=>{
+        spinningMedal.value = false
     })
 }
 
 
 function getAllStudents(){
+    spinningStudent.value = true
     http.post(`/cloud/student/allStudents`,{
         id:selectClass.value.id,
         type:'4',
@@ -150,7 +262,7 @@ function getAllStudents(){
         console.log('res',res)
         state.dataList = res.data
     }).finally(()=>{
-        
+        spinningStudent.value = false
     })
 }
 
@@ -182,32 +294,35 @@ function handleUserClick(e){
         });
     }
 }
-watch(()=>selectClass.value?.id,()=>{
-    // 获取学生
-    getAllStudents()
-    //
-})
+// watch(()=>selectClass.value?.id,()=>{
+//     // 获取学生
+//     getAllStudents()
+//     //
+// })
 
 
-onMounted(() => {
+onMounted(async () => {
     if(dataListRef.value){
-       state.clientHeight = dataListRef.value.clientHeight
+       state.clientHeight = dataListRef.value?.clientHeight
+       state.clientWidth = dataListRef.value?.clientWidth
     }
 
     window.addEventListener('resize', () => {
        const arr = [...state.dataList]
        state.dataList = []
        state.clientHeight = 0
+       state.clientWidth = 0
        state.updateKey++
        nextTick(()=>{
-           state.clientHeight = dataListRef.value?.clientHeight           
-            state.dataList =  arr
+           state.clientHeight = dataListRef.value?.clientHeight
+           state.clientWidth = dataListRef.value?.clientWidth
+           state.dataList =  arr
        })
     })
+    await userInfo.queryClassMaterList()
 
     nextTick(()=>{
-        userInfo.queryClassMaterList()
-        
+        getAllStudents()
         getPageEvalMedal()
     })
     
@@ -350,6 +465,16 @@ onMounted(() => {
                             }
                         }
                     }
+                    .item_content.active{
+                        border: 2px solid #FF9433 !important;
+                        .item_content__active{
+                            background-color: #FF9433 !important;
+                        }
+                        .item_content__bg{
+                             background: url('../../../assets/bg-content-sl.png') no-repeat !important;
+                             background-size: contain !important;
+                        }
+                    }
                 }
                 &:last-child {
                     &::after{
@@ -361,14 +486,20 @@ onMounted(() => {
                         width: 1px;
                         background-color: #C9C9C9;
                     }
-                    .list_item{
-                        &:hover{                            
-                            .item_content__active{
-                                background-color: #00B781 !important;
-                                transition: all 0.23s;
-                            }
+                    // .list_item{
+                    //     &:hover{                            
+                    //         .item_content__active{
+                    //             background-color: #00B781 !important;
+                    //             transition: all 0.23s;
+                    //         }
+                    //     }
+                    // }    
+                    .item_content.active{
+                        .item_content__active{
+                            background-color: #00B781 !important;
+                            transition: all 0.23s;
                         }
-                    }      
+                    }  
                     .item_content__active{
                         background-color: #C9C9C9 !important;
                         width: 18px !important;
@@ -452,16 +583,7 @@ onMounted(() => {
                     }
                     
 
-                    .item_content.active{
-                        border: 2px solid #FF9433 !important;
-                        .item_content__active{
-                            background-color: #FF9433 !important;
-                        }
-                        .item_content__bg{
-                             background: url('../../../assets/bg-content-sl.png') no-repeat !important;
-                             background-size: contain !important;
-                        }
-                    }
+                    
                 }
             }
 
@@ -470,8 +592,13 @@ onMounted(() => {
                 overflow-y: scroll;
             }
         }
+    }
 
-
+    :deep(.ant-spin-spinning ){
+       position: absolute;
+       left: 50%;
+       top: 50%;
+       transform: translate3d(-50%,-50%,0);
     }
 }
 </style>

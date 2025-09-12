@@ -405,7 +405,7 @@ http.interceptors.response.use(
     },
     (error) => {
         const { config, response } = error
-        const { loading } = config
+        const { loading } = config || {}
         // 从pendingRequest对象中移除请求
         removePendingRequest(config || {})
         // if (loading) globalLogin("hide")

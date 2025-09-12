@@ -10,13 +10,13 @@
                         <div class="current_class">
                             <span class="current_class__name ellipsis">{{
                                 selectClass?.showName || selectClass?.name
-                                }}</span>
+                            }}</span>
                             <div class="switch_class"></div>
                         </div>
                         <template #overlay>
                             <a-menu @click="handleSelectClass">
                                 <a-menu-item :key="item.id" v-for="(item, idx) in classMaterList">
-                                    <a href="javascript:;">{{ item.showName || item.name }}</a>
+                                    <a href="javascript:;" :style="{color:item.id ==selectClass.id ? '#00B781' :'' }">{{ item.showName || item.name }}</a>
                                 </a-menu-item>
                             </a-menu>
                         </template>
@@ -24,7 +24,12 @@
 
                     <a-dropdown placement="bottom" :arrow="{ pointAtCenter: true }">
                         <div class="current_class" style="margin-right: 30px">
-                            <a-avatar size="36" :src="user.avatar" />
+                            <a-avatar size="36" v-if="user.avatar" :src="user.avatar" />
+                           <a-avatar size="36" v-else style="background: none;">
+                                <template #icon>
+                                    <img src="../../../assets/pic-head.png"  alt="">
+                                </template>
+                           </a-avatar>
                             <CaretDownOutlined style="color: #fff; margin-left: 3px" />
                         </div>
                         <template #overlay>
@@ -57,37 +62,63 @@
                     <a-tab-pane key="2" tab="勋章"></a-tab-pane>
                     <a-tab-pane key="3" tab="积分卡"></a-tab-pane>
                 </a-tabs>
-                <div class="banner"></div>
+                <div :class="`banner banner_${state.activeKey}`"></div>
                 <div class="header">
-                    <div class="header_item header_item__active">全校排名</div>
-                    <div class="header_item">本班排名</div>
+                    <div class="header_item" :class="{
+                        'header_item__active': checkedSchool
+                    }" @click="handleSchoolRanking(true)">全校排名</div>
+                    <div class="header_item" :class="{
+                        'header_item__active': !checkedSchool
+                    }" @click="handleSchoolRanking(false)">本班排名</div>
                 </div>
                 <div class="list_warper" ref="listRef" :key="state.updateKey">
                     <!-- 列表 -->
-                    <div class="list_box" :style="{ height: state.clientHeight + 'px' }" ref="scrollRef"
-                        @scroll="handleScroll">
-                        <div v-for="(item, index) in state.dataList" :key="index" class="list_item">
-                            <div class="left">
-                                <div class="number">
-                                    <div v-if="[1, 2, 3].includes(index + 1)" :class="`number_icon_${index + 1}`"></div>
-                                    <div v-else>{{ index + 1 }}</div>
+                    <a-spin :spinning="spinning">
+                        <div class="list_box" :style="{ height: state.clientHeight + 'px' }" ref="scrollRef"
+                            @scroll="handleScroll">
+                            <div v-for="(item, index) in state.dataList" :key="index" class="list_item">
+                                <div class="left">
+                                    <div class="number">
+                                        <div v-if="[1, 2, 3].includes(index + 1)" :class="`number_icon_${index + 1}`">
+                                        </div>
+                                        <div v-else>{{ index + 1 }}</div>
+                                    </div>
+                                    <a-avatar class="avatar" size="32" :src="item.avatar" />
+                                    <div class="name">{{ item.personName }}</div>
                                 </div>
-                                <a-avatar class="avatar" size="32" :src="item.avatar" />
-                                <div class="name">{{ item.personName }}</div>
-                            </div>
-                            <div class="right">
-                                <div class="rank_change">
-                                    <ArrowUpOutlined style="color: red" />
-                                    <ArrowDownOutlined style="color: #00b371" />
-                                    <span style="padding-left: 3px">较上周提升{{ item.rankingChange }}名</span>
+                                <div class="right">
+                                    <div class="rank_change">
+                                        <div v-if="item.rankingChange != 0 && item.rankingChange != null">
+                                            <ArrowUpOutlined style="color: red" v-if="item.rankingChange > 0" />
+                                            <ArrowDownOutlined style="color: #00b371" v-if="item.rankingChange < 0" />
+                                            <span style="padding-left: 3px">较上周{{ item.rankingChange > 0 ? `提升
+                                                ${item.rankingChange}` : `下降 ${0-item.rankingChange}` }} 名</span>
+                                        </div>
+                                    </div>
+                                    <div class="total_score">{{ item.totalScore || item.totalCount || 0 }} 总积分</div>
                                 </div>
-                                <div class="total_score">{{ item.totalScore }}总积分</div>
                             </div>
+                            <!--  -->
+                            <a-empty :image-style="{
+                                height: '160px',
+                                marginTop: '100px'
+                            }" v-if="state.dataList.length == 0 && !loading && !spinning">
+                                <template #image>
+                                    <img src="../../../assets/empty.png" alt="">
+                                </template>
+                                <template #description>
+                                    <span>
+                                        暂无数据！
+                                        <a href="javascript:;" @click="changeTabs(state.activeKey)">重新加载</a>
+                                    </span>
+                                </template>
+                            </a-empty>
+
+                            <!-- 加载状态提示 -->
+                            <!---->
+                            <div v-if="!hasMore" class="no-more">没有更多数据了!</div>
                         </div>
-                        <!-- 加载状态提示 -->
-                        <!---->
-                        <div v-if="!hasMore" class="no-more">没有更多数据了!</div>
-                    </div>
+                    </a-spin>
                     <div v-if="loading" class="loading">
                         <LoadingOutlined /> 加载中...
                     </div>
@@ -125,6 +156,13 @@ const router = useRouter();
 
 const loading = ref(false);
 const hasMore = ref(true);
+const spinning = ref(true)
+
+let timer = null;
+const debounce = (func, delay) => {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(func, delay);
+};
 
 const state = reactive({
     activeKey: "1",
@@ -132,7 +170,45 @@ const state = reactive({
     dataList: [],
     clientHeight: 514,
     pageNo: 1,
+    checkedSchool1: true,
+    checkedSchool2: true,
+    checkedSchool3: true,
 });
+
+const checkedSchool = computed(() => {
+    const checkMap = {
+        '1': state.checkedSchool1,
+        '2': state.checkedSchool2,
+        '3': state.checkedSchool3
+    }
+    return checkMap[state.activeKey]
+})
+
+function handleSchoolRanking(checked) {
+    debounce(() => {
+        state.pageNo = 1
+        hasMore.value = true
+        switch (state.activeKey) {
+            case '1':
+                state.checkedSchool1 = checked
+                fetchData(state.activeKey)
+                break;
+            case '2':
+                state.checkedSchool2 = checked
+                fetchData(state.activeKey)
+                break;
+            case '3':
+                state.checkedSchool3 = checked
+                fetchData(state.activeKey)
+                break;
+            default:
+                break;
+        }
+    }, 300)
+
+
+
+}
 
 function openHome() {
     router.push("/windowMain/home");
@@ -141,6 +217,12 @@ function openHome() {
 function handleSelectClass(e) {
     // console.log(e.key);
     userInfo.changeCLass(e.key);
+
+    nextTick(() => {
+        state.pageNo = 1;
+        hasMore.value = true;
+        fetchData(state.activeKey);
+    })
 }
 
 function handleUserClick(e) {
@@ -164,12 +246,17 @@ function handleUserClick(e) {
 }
 
 function changeTabs(activeKey) {
-    state.pageNo = 1;
+    debounce(() => {
+        state.pageNo = 1;
+        hasMore.value = true
+        fetchData(activeKey)
+    }, 300)
 }
 
 async function fetchData(activeKey) {
     if (loading.value || !hasMore.value) return;
-    loading.value = true;
+    loading.value = state.pageNo == 1 ? false : true;
+    spinning.value = state.pageNo == 1
     const urlMap = {
         1: `/cloud/evalStatistic/pageEvalPersonScore`,
         2: `/cloud/evalMedal/record/pageMedalRecordCount`,
@@ -178,9 +265,9 @@ async function fetchData(activeKey) {
     const url = urlMap[activeKey];
     const params = {
         pageNo: state.pageNo,
-        pageSize: 15,
+        pageSize: 20,
         identity: 0,
-        classesId: selectClass.value.id,
+        classesId: checkedSchool.value ? '' : selectClass.value.id,
     };
     http
         .post(url, params)
@@ -189,19 +276,24 @@ async function fetchData(activeKey) {
             if (list.length < 10) {
                 hasMore.value = false; // 数据不足一页，说明到底了
             }
-            state.dataList.push(...list);
+            if (state.pageNo == 1) {
+                scrollRef.value?.scrollTo({
+                    top: 0,
+                    behavior: 'auto'
+                })
+                state.dataList = list
+            } else {
+                state.dataList.push(...list);
+            }
             state.pageNo++;
         })
         .finally(() => {
             loading.value = false;
+            spinning.value = false
         });
 }
 
-let timer = null;
-const debounce = (func, delay) => {
-    if (timer) clearTimeout(timer);
-    timer = setTimeout(func, delay);
-};
+
 
 function handleScroll(e) {
     const { scrollTop, clientHeight, scrollHeight } = scrollRef.value;
@@ -220,7 +312,6 @@ function handleScroll(e) {
 
 onMounted(() => {
     if (listRef.value) {
-        console.log(listRef.value.clientHeight);
         state.clientHeight = listRef.value.clientHeight;
     }
 
@@ -231,7 +322,7 @@ onMounted(() => {
         state.updateKey++;
         nextTick(() => {
             state.clientHeight = listRef.value?.clientHeight;
-            state.dataList =  arr
+            state.dataList = arr
         });
     });
 
@@ -293,8 +384,13 @@ onMounted(() => {
                 background-repeat: no-repeat;
                 background-size: 100% 100%;
                 background-position: center;
-                border-radius: 8px;
                 transition: all 0.2s;
+            }
+            .banner_2{
+                background-image: url("../../../assets/ranking-banner2.png");
+            }
+            .banner_3{
+                background-image: url("../../../assets/ranking-banner3.png");
             }
 
             .header {
@@ -413,6 +509,7 @@ onMounted(() => {
                         padding: 16px 0;
                         font-size: 12px;
                         color: #999999;
+
                     }
                 }
 
@@ -420,12 +517,13 @@ onMounted(() => {
                     text-align: center;
                     padding: 16px 0;
                     font-size: 12px;
-                    color: #999999;
+                    color: #00B371;
                     position: absolute;
                     left: 0;
                     right: 0;
                     bottom: 0;
                     background-color: #fff;
+                    border-radius: 0 0 8px 8px;
                 }
             }
         }

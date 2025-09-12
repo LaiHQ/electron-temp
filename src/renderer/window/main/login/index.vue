@@ -43,7 +43,7 @@
                                     <view class="scan-corner top-right"></view>
                                     <view class="scan-corner bottom-left"></view>
                                     <view class="scan-corner bottom-right"></view>
-                                    <a-qrcode :value="state.qrcode" :size="110" :bordered="false" />
+                                    <a-qrcode :value="state.qrcode" :size="110" :bordered="false" :status="state.qrcodeStatus" @refresh="generateQrCode"/>
                                 </div>
                             </div>
                             <div style="text-align: center;font-size: 12px;color: #666666;padding-top: 20px;">请用手机扫码登录
@@ -96,7 +96,7 @@
 </template>
 
 <script setup>
-import { reactive, onMounted,ref } from 'vue'
+import { reactive, onMounted,ref,onUnmounted } from 'vue'
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import 'swiper/css';
 import { useRouter } from 'vue-router'
@@ -126,7 +126,9 @@ const state = reactive({
     schoolList: [],
     current:0,
     loginType: 'pwd', // pwd | qrcode
-    qrcode: '2323232'
+    qrcode: '',
+    qrcodeStatus:'loading',
+    random:''
 })
 
 let instanceSwiper = null
@@ -164,17 +166,55 @@ function handleBack(){
     state.step = 1
 }
 
+let time = null
+
+function watchAuthQrCode(){
+    clearInterval(time)
+    time = setInterval(()=>{
+        http.get(`/auth/qrcode/check?random=${state.random}`).then(res=>{
+            const {expiresIn,status,ticket} = res.data
+            // ['未扫码', '已扫码', '已过期', '已授权', '取消授权'],
+            if(expiresIn<=0 || status ==2){
+                state.qrcodeStatus = 'expired'
+                clearInterval(time)
+            }
+            if(status==1){
+               state.qrcodeStatus = 'scanned'
+            }
+            if(status==3){
+               clearInterval(time)              
+               submitLogin(JSON.parse(ticket))
+            }
+        })
+    },1000)
+}
+
+function generateQrCode(){
+    state.qrcodeStatus = 'loading'
+    http.get(`/auth/qrcode/gene`).then(res=>{
+        const {expiresIn,qrCodeScannedUrl,random} = res.data
+        state.qrcode = qrCodeScannedUrl
+        state.qrcodeStatus = 'active'
+        state.random = random        
+        watchAuthQrCode()
+    }).finally(()=>{
+
+    })
+}
+
 function changeLoginType() {
     if (state.loginType === 'pwd') {
         state.loginType = 'qrcode'
+        generateQrCode()
     } else {
         state.loginType = 'pwd'
+        clearInterval(time)
     }
 }
 
-const onFinish = (values) => {
+function submitLogin(params){
     state.loading = true
-    http.postForm('/auth/oauth/token', formState).then(async (res) => {
+    http.postForm('/auth/oauth/token', params).then(async (res) => {
         const { accessToken, refreshToken } = res.data
 
         localStorage.setItem('token', accessToken)
@@ -197,18 +237,15 @@ const onFinish = (values) => {
             localStorage.removeItem('token')
             localStorage.removeItem('refresh_token')
         }
-
-        
-
-
-       
-
-
     }).catch((error) => {
         console.error('Login failed:', error);
     }).finally(() => {
         state.loading = false
     })
+}
+
+const onFinish = (values) => {
+    submitLogin(formState)
 };
 
 const onFinishFailed = (errorInfo) => {
@@ -217,6 +254,10 @@ const onFinishFailed = (errorInfo) => {
 
 onMounted(() => {
     
+})
+
+onUnmounted(()=>{
+    clearInterval(time)
 })
 
 </script>

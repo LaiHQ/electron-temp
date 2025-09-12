@@ -1,5 +1,6 @@
 <template>
   <a-config-provider
+  :locale="zh_CN"
     :theme="{
       token: {
         colorPrimary: '#00B781',
@@ -11,6 +12,7 @@
 </template>
 
 <script setup lang="ts">
+import zh_CN from "ant-design-vue/es/locale/zh_CN"
 // import { version } from '../../package.json'
 
 // console.log(version)
