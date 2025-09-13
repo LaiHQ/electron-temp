@@ -1,7 +1,7 @@
 {
   "name": "huaqiang-electron",
   "private": true,
-  "version": "1.0.12",
+  "version": "1.0.13",
   "scripts": {
     "dev": "vite",
     "dev:browser": "vite",
