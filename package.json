@@ -1,13 +1,14 @@
 {
   "name": "huaqiang-electron",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scripts": {
     "dev": "vite",
     "dev:browser": "vite",
-    "build": "vite build",
+    "build": "npm run release && vite build",
     "preview": "vite preview",
     "build-icon": "electron-icon-builder --input=./resources/logo.png --output=resources --flatten",
+    "release": "standard-version",
     "rebuild": "electron-rebuild -f -w better-sqlite3"
   },
   "devDependencies": {
