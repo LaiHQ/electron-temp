@@ -3,14 +3,14 @@ import http from "../utils/http";
 
 //定义一个Store
 export const useUserInfoStore = defineStore("user", {
-  state: () => {
+    state: () => {
         return {
             user: {},
             classMaterList: [],
             currentClassId:''
         }
     },
-     getters: {
+    getters: {
         getUser(state) {
             return state.user
         },
@@ -23,13 +23,18 @@ export const useUserInfoStore = defineStore("user", {
 
     },
     actions: {
+        clearUserInfo(){
+            this.user = {}
+            this.classMaterList = []
+            this.currentClassId = ''
+        },
         setupUserInfo(user = {}) {
             this.user = user
         },
         changeCLass(id:string){
             this.currentClassId = id
         },
-        queryClassMaterList(){
+        queryClassMaterList(cb){
             const _this = this
             return new Promise((resolve,reject)=>{
                 http.get('/cloud/v3/classes/queryClassMaterList').then((res:any)=>{        
@@ -40,6 +45,7 @@ export const useUserInfoStore = defineStore("user", {
                     resolve(res.data || []);
                 }).catch((err)=>{
                     reject(err)
+                    cb && cb(err)
                     console.log('获取班级列表失败',err)
                 })
             })

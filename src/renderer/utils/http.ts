@@ -56,14 +56,14 @@ const tipMsg = debounce((msg: string, type: "success" | "info" | "warning" | "er
 const http = axios.create({
     baseURL: import.meta.env.VITE_BASE_URL as string,
     timeout: 5000,
-    adapter: adapterEnhancer({
-        // 默认禁用缓存
-        enabledByDefault: true,
-        // 缓存时间为5s
-        maxAge: 5000,
-        // 重试时间
-        delay: 1000
-    }),
+    // adapter: adapterEnhancer({
+    //     // 默认禁用缓存
+    //     enabledByDefault: true,
+    //     // 缓存时间为5s
+    //     maxAge: 5000,
+    //     // 重试时间
+    //     delay: 1000
+    // }),
     withCredentials: true
     // headers: { 'Content-Type': 'application/json' },
     // headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -266,25 +266,32 @@ function toLogin() {
 async function handleRefreshToken(config: AxiosRequestConfig) {
     try {
         const beforRefreshToken = localStorage.getItem("refresh_token")
-        const instance = axios.create({
-            baseURL: import.meta.env.VITE_BASE_URL as string,
-            timeout: 5000,
-            withCredentials: true,
-            headers: {
-                "Content-Type": "application/json;charset=UTF-8",
-                Authorization: `Bearer ${beforRefreshToken}`
+        if(beforRefreshToken){
+            const instance = axios.create({
+                baseURL: import.meta.env.VITE_BASE_URL as string,
+                timeout: 5000,
+                withCredentials: true,
+                headers: {
+                    "Content-Type": "application/json;charset=UTF-8",
+                    // Authorization: `Bearer ${beforRefreshToken}`
+                }
+            })
+            const result = await instance.post("/cloud/machineAccount/refresh-token",{
+                refreshToken: beforRefreshToken
+            })
+
+            if (result) {
+                const { refreshToken, accessToken } = result.data.data
+                localStorage.setItem("token", accessToken)
+                localStorage.setItem("refresh_token", refreshToken)
+                // 对之前错误的接口再次请求
+                config.cancelToken = void 0
+                // debugger
+                http(config)
+                return Promise.resolve("update token")
             }
-        })
-        const result = await instance.post("/user/refreshToken")
-        if (result) {
-            const { refreshToken, token } = result.data.data
-            localStorage.setItem("token", token)
-            localStorage.setItem("refresh_token", refreshToken)
-            // 对之前错误的接口再次请求
-            config.cancelToken = void 0
-            // debugger
-            http(config)
-            return Promise.resolve("update token")
+        }else{
+            return Promise.reject()
         }
     } catch (error) {
         return Promise.reject(error)
@@ -301,14 +308,14 @@ async function handleHttpError(status: number, config: AxiosResponse) {
             break
         case 401:
             errMessage = "未授权，请重新登录"
-            // try {
-            //     await handleRefreshToken(config)
-            //     return false
-            // } catch (error) {
-            //     setTimeout(() => {
-            //         toLogin()
-            //     }, 1000)
-            // }
+            try {
+                await handleRefreshToken(config)
+                return false
+            } catch (error) {
+                setTimeout(() => {
+                    toLogin()
+                }, 1000)
+            }
             break
         case 403:
             errMessage = "拒绝访问"
@@ -367,9 +374,9 @@ http.interceptors.request.use(
         const { loading, loadingText } = config as InternalAxiosRequestConfig & CustomAxiosRequestConfig
         // debugger
         // 检查是否存在重复请求，若存在则取消已发的请求
-        removePendingRequest(config)
+        // removePendingRequest(config)
         // 把当前请求信息添加到pendingRequest对象中
-        addPendingRequest(config)
+        // addPendingRequest(config)
         // if (loading) globalLogin("show", loadingText)
         const token = localStorage.getItem("token")
         if (token) config.headers["Authorization"] = `Bearer ${token}`
@@ -385,7 +392,7 @@ http.interceptors.response.use(
     (response) => {
         const { loading, successMessage } = response.config as InternalAxiosRequestConfig & CustomAxiosRequestConfig
         // 从pendingRequest对象中移除请求
-        removePendingRequest(response.config)
+        // removePendingRequest(response.config)
         // if (loading) globalLogin("hide")
         if (response.status === 200) {
             // 二进制
@@ -407,7 +414,7 @@ http.interceptors.response.use(
         const { config, response } = error
         const { loading } = config || {}
         // 从pendingRequest对象中移除请求
-        removePendingRequest(config || {})
+        // removePendingRequest(config || {})
         // if (loading) globalLogin("hide")
         if (axios.isCancel(error)) {
             console.log(`%c【ERROR】已取消重复请求： ${error.message}`, "color:red")

@@ -168,35 +168,51 @@ function handleBack(){
 
 let time = null
 
-function watchAuthQrCode(){
-    clearInterval(time)
-    time = setInterval(()=>{
-        http.get(`/auth/qrcode/check?random=${state.random}`).then(res=>{
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
+async function watchAuthQrCode(){
+        if(state.loginType == 'pwd')return;
+        await sleep(1000);
+        http.get(`/auth/qrcode/check?random=${state.random}`).then(async res=>{
             const {expiresIn,status,ticket} = res.data
             // ['未扫码', '已扫码', '已过期', '已授权', '取消授权'],
-            if(expiresIn<=0 || status ==2){
-                state.qrcodeStatus = 'expired'
-                clearInterval(time)
+            if(status==0){
+                await sleep(1000);
+                watchAuthQrCode()
             }
-            if(status==1){
+            if(expiresIn<=0 || status ==2){
+                state.qrcodeStatus = 'expired'               
+            }
+            if(status==1){                
                state.qrcodeStatus = 'scanned'
+               await sleep(1000);
+               watchAuthQrCode()
             }
             if(status==3){
-               clearInterval(time)              
                submitLogin(JSON.parse(ticket))
             }
+            if(status==4){
+                state.qrcodeStatus = 'expired'
+            }
+        }).catch(async ()=>{
+            await sleep(1000);
+            watchAuthQrCode()
         })
-    },1000)
 }
 
 function generateQrCode(){
     state.qrcodeStatus = 'loading'
-    http.get(`/auth/qrcode/gene`).then(res=>{
+    http.get(`/auth/qrcode/gene`).then(async res=>{
         const {expiresIn,qrCodeScannedUrl,random} = res.data
         state.qrcode = qrCodeScannedUrl
         state.qrcodeStatus = 'active'
         state.random = random        
         watchAuthQrCode()
+    }).catch(()=>{
+            
     }).finally(()=>{
 
     })
@@ -208,7 +224,6 @@ function changeLoginType() {
         generateQrCode()
     } else {
         state.loginType = 'pwd'
-        clearInterval(time)
     }
 }
 
@@ -256,9 +271,7 @@ onMounted(() => {
     
 })
 
-onUnmounted(()=>{
-    clearInterval(time)
-})
+
 
 </script>
 

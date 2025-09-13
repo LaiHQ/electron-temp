@@ -7,9 +7,6 @@ import { buildPlugin } from "./plugins/buildPlugin";
 import optimizer from "vite-plugin-optimizer";
 import path from "path";
 
-import {
-  AndDesignVueResolve,
-} from "vite-plugin-style-import";
 import Components from "unplugin-vue-components/vite";
 import { AntDesignVueResolver as AntDesignVueComp } from "unplugin-vue-components/resolvers";
 
@@ -18,10 +15,7 @@ export default defineConfig(({ command, mode, ssrBuild }) => {
   // const env = loadEnv(mode, process.cwd(), '')
   console.log("mode", mode);
   return {
-    css: {
-      // modules: {
-      //   localsConvention: "camelCase",
-      // },
+    css: {     
       preprocessorOptions: {
         less: {
           modifyVars: {
@@ -51,7 +45,7 @@ export default defineConfig(({ command, mode, ssrBuild }) => {
     plugins: [
       optimizer(getReplacer()),
       devPlugin(),
-      vue(),      
+      vue(),
       Components({
         resolvers: [
           AntDesignVueComp({

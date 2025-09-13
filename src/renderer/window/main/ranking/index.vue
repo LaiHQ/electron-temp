@@ -237,6 +237,8 @@ function handleUserClick(e) {
                 // 退出登录
                 localStorage.removeItem("token");
                 localStorage.removeItem("refresh_token");
+                // 
+                userInfo.clearUserInfo()
                 router.push("/windowMain/login");
                 message.success("安全退出");
             },
@@ -267,8 +269,15 @@ async function fetchData(activeKey) {
         pageNo: state.pageNo,
         pageSize: 20,
         identity: 0,
-        classesId: checkedSchool.value ? '' : selectClass.value.id,
+        classesId: checkedSchool.value ? '' : selectClass.value?.id,
     };
+    if(!checkedSchool.value && !selectClass.value?.id){
+        state.dataList = []
+        spinning.value = false
+        message.warning('查询排名失败，未获取到相关班级数据！')
+        return
+    }
+
     http
         .post(url, params)
         .then((res) => {
