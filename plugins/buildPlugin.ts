@@ -1,6 +1,9 @@
 import path from 'path'
 import fs from 'fs-extra'
-const { build } = require("electron-builder");
+
+
+
+
 class BuildObj {
   buildMain() {
     require('esbuild').buildSync({
@@ -34,8 +37,9 @@ class BuildObj {
     // let srcDir = path.join(process.cwd(), `loading.html`)
     // let destDir = path.join(process.cwd(), `dist/loading.html`)
     // fs.copySync(srcDir, destDir)
-
+    const { build,Platform } = require("electron-builder");
     let options = {
+      targets:Platform.WINDOWS.createTarget(),
       config: {
         directories: {
           output: path.join(process.cwd(), 'release'),
@@ -49,7 +53,7 @@ class BuildObj {
         asar: true,
         win: {
           //win相关配置
-          icon: '/resources/icons/icon.ico', //图标，当前图标在根目录下，注意这里有两个坑
+          icon: './resources/icons/icon.ico', //图标，当前图标在根目录下，注意这里有两个坑
           target: [
             {
               target: 'nsis', //利用nsis制作安装程序,打包文件的后缀为exe
@@ -91,8 +95,13 @@ class BuildObj {
           releaseNotesFile: 'release-notes.md',
         },
       },
-      project: process.cwd(),
+      // project: process.cwd(),
     }
+    
+    
+    // Platform.MAC; //Platform.LINUX;
+    console.log(Platform.WINDOWS)
+
     return build(options)
   }
 }
@@ -101,7 +110,8 @@ export let buildPlugin = () => {
   return {
     name: 'build-plugin',
     closeBundle: () => {
-      let buildObj = new BuildObj()
+      let buildObj = new BuildObj()      
+
       buildObj.buildMain()
       buildObj.preparePackageJson()
       buildObj.buildInstaller()

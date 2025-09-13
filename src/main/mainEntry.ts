@@ -105,7 +105,7 @@ function createWindow() {
   } else {
     // 生产模式
     CustomScheme.registerScheme();
-    mainWindow.loadURL(`app://index.html`);
+    mainWindow.loadURL(`app://index.html`);   
   }
 
   CommonWindowEvent.listen();
@@ -121,7 +121,7 @@ function createWindow() {
 function createTray() {
   // 创建icon我这里使用的是一个png
   const icon = nativeImage.createFromPath(
-    path.join(process.cwd(), "/src/renderer/assets/logo32.png")
+    path.join(process.cwd(), "/resources/icons/16x16.png")
   );
   // 实例化一个 托盘对象，传入的是托盘的图标
   const tray = new Tray(icon);

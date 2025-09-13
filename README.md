@@ -1,11 +1,3 @@
-<!--
- * @Descripttion: 
- * @version: 1.0.0
- * @Author: lai_hq@qq.com
- * @Date: 2022-12-12 15:58:44
- * @LastEditors: lai_hq@qq.com
- * @LastEditTime: 2022-12-19 17:42:43
--->
 
 ## 注意点
 
