@@ -33,7 +33,7 @@ export class CustomScheme {
   }
   //注册自定义app协议
   static registerScheme(name?:string) {
-    protocol.registerStreamProtocol("app", (request, callback) => {
+    protocol.registerStreamProtocol("app", (request, callback) => {      
       let pathName = new URL(request.url).pathname;
       let extension = path.extname(pathName).toLowerCase();
       if (extension == "") {

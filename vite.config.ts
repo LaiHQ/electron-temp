@@ -12,6 +12,7 @@ export default defineConfig(({ command, mode, ssrBuild }) => {
   // const env = loadEnv(mode, process.cwd(), '')
   console.log("mode", mode);
   return {
+    
     css: {     
       preprocessorOptions: {
         less: {

@@ -74,7 +74,6 @@ export class CommonWindowEvent {
       }
       //@ts-ignore
       if (config["modal"] === true) config.parent = win;
-      // console.log(config);
       return { action: "allow", overrideBrowserWindowOptions: config  };
     });
   }

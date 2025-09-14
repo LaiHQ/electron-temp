@@ -44,7 +44,8 @@ export class Updater {
     // 检查更新
     console.log(`开始检查更新`)
     autoUpdater.checkForUpdates().catch((err) => {
-      console.log('网络连接问题', err)
+      console.log('网络连接问题', err)     
+      
     })
     // 当 autoUpdater.checkForUpdates() 方法执行时，
     // 应用会先请求 release目录下 这个 yml 文件，得到文件里的内容后，再拿此文件中的版本号与当前版本号对比，

@@ -410,9 +410,15 @@ http.interceptors.response.use(
 
         return Promise.resolve(response.data)
     },
-    (error) => {
-        const { config, response } = error
+    (error) => {       
+
+        const { config, response,code } = error
         const { loading } = config || {}
+        if (code === 'ECONNABORTED') {
+            message.error('请求超时，请检查网络连接或稍后重试')
+            return Promise.reject(error || {})
+        } 
+
         // 从pendingRequest对象中移除请求
         // removePendingRequest(config || {})
         // if (loading) globalLogin("hide")

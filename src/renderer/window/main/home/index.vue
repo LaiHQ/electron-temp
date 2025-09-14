@@ -100,7 +100,7 @@
                         <a-spin :spinning="spinningMedal">
                             <div class="select_desc">已选择 <span style="font-size: 16px;">{{
                                 state.checkedStudentList.length
-                            }}</span> 位同学，快给他们发送勋章吧～</div>
+                                    }}</span> 位同学，快给他们发送勋章吧～</div>
                             <div class="list_item__box" :style="{ height: (state.clientHeight - 80) + 'px' }">
                                 <div class="list_item" :style="{
                                     width: `${state.clientWidth > 1200 ? 20 : 25}%`
@@ -159,6 +159,7 @@ import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
 
 import { useUserInfoStore } from "../../../store/useStore"
 import http from "../../../utils/http";
+
 const userInfo = useUserInfoStore()
 const user = computed(() => userInfo.getUser)
 const classMaterList = computed(() => userInfo.getClassMaterList)
@@ -310,13 +311,11 @@ function handleUserClick(e) {
 //     //
 // })
 
-
 onMounted(async () => {
     if (dataListRef.value) {
         state.clientHeight = dataListRef.value?.clientHeight
         state.clientWidth = dataListRef.value?.clientWidth
     }
-
     window.addEventListener('resize', () => {
         const arr = [...state.dataList]
         state.dataList = []
@@ -329,13 +328,16 @@ onMounted(async () => {
             state.dataList = arr
         })
     })
-    await userInfo.queryClassMaterList()
+
+    await userInfo.queryClassMaterList(() => {
+        spinningStudent.value = false
+        spinningMedal.value = false
+    })
 
     nextTick(() => {
         getAllStudents()
         getPageEvalMedal()
     })
-
 })
 
 

@@ -37,9 +37,21 @@ class BuildObj {
     // let srcDir = path.join(process.cwd(), `loading.html`)
     // let destDir = path.join(process.cwd(), `dist/loading.html`)
     // fs.copySync(srcDir, destDir)
-    const { build,Platform } = require("electron-builder");
+    const { build,Platform } = require("electron-builder"); 
+    const targets = (()=>{
+      if(process.argv.includes('--mode=win')){
+        return Platform.WINDOWS.createTarget()
+      }
+      if(process.argv.includes('--mode=mac')){
+        return Platform.MAC.createTarget()
+      }
+      if(process.argv.includes('--mode=linux')){
+        return Platform.LINUX.createTarget()
+      }
+    })()
+
     let options = {
-      targets:Platform.WINDOWS.createTarget(),
+      targets,
       config: {
         directories: {
           output: path.join(process.cwd(), 'release'),
@@ -47,8 +59,8 @@ class BuildObj {
         },
         files: ['**'],
         extends: null,
-        productName: process.env.NODE_ENV == 'uat' ? '课堂评价-uat' : "课堂评价", //项目名，也是生成的安装文件名，即aDemo.exe
-        appId: 'com.ydevaluate.desktop',
+        productName: process.env.NODE_ENV == 'uat' ? '课堂评价' : "课堂评价", //项目名，也是生成的安装文件名，即aDemo.exe
+        appId: 'com.ydktpjapp.desktop',
         copyright: 'Copyright © 2025', //版权信息
         asar: true,
         win: {
@@ -95,13 +107,7 @@ class BuildObj {
           releaseNotesFile: 'release-notes.md',
         },
       },
-      // project: process.cwd(),
-    }
-    
-    
-    // Platform.MAC; //Platform.LINUX;
-    console.log(Platform.WINDOWS)
-
+    }    
     return build(options)
   }
 }
@@ -110,8 +116,7 @@ export let buildPlugin = () => {
   return {
     name: 'build-plugin',
     closeBundle: () => {
-      let buildObj = new BuildObj()      
-
+      let buildObj = new BuildObj()
       buildObj.buildMain()
       buildObj.preparePackageJson()
       buildObj.buildInstaller()

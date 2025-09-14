@@ -46,3 +46,19 @@ html,body{
     text-overflow: ellipsis;    
     white-space: nowrap;
 }
+
+
+.disabled-drag {
+    -webkit-user-drag: none;
+    user-select: none;
+    pointer-events: none;
+    cursor: default;
+}
+
+.disabled-drag img {
+    /* 关键属性：禁止图片拖拽 */
+            -webkit-user-drag: none;
+            user-select: none;
+            pointer-events: none;
+            cursor: default;        
+}

@@ -5,6 +5,7 @@ import http from "../utils/http";
 export const useUserInfoStore = defineStore("user", {
     state: () => {
         return {
+            isMaximized:false,
             user: {},
             classMaterList: [],
             currentClassId:''
@@ -19,10 +20,16 @@ export const useUserInfoStore = defineStore("user", {
         },
         getCurrentClass(state){
             return state.classMaterList.find(i=> i.id === state.currentClassId)
+        },
+        getIsMaximized(state){
+            return state.isMaximized
         }
 
     },
     actions: {
+        changeMaximized(status:boolean){
+            this.isMaximized = status
+        },
         clearUserInfo(){
             this.user = {}
             this.classMaterList = []

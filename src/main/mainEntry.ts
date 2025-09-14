@@ -48,7 +48,7 @@ function createWindow() {
     show: false,
     minWidth: 900, // 设置最小宽度为 400 像素
     minHeight: 800,
-    icon: path.join(process.cwd(), "/resources/icons/icon.ico"),
+    icon: path.join(process.cwd(), "/resources/icons/icon.icns"),
     webPreferences: {
       nodeIntegration: true,
       webSecurity: false,
@@ -93,19 +93,17 @@ function createWindow() {
       }, 1000 * 60 * 5);
     }
   });
-
   if (process.argv[2]) {
     // 开发模式
-    // mainWindow.webContents.openDevTools({ mode: "right" });
+    mainWindow.webContents.openDevTools({ mode: "right" });
     // mainWindow.setSimpleFullScreen(true)
     // console.log("process.argv[2]",process.argv)
     // mainWindow.loadURL(process.argv[2]);
-    mainWindow.loadURL(`http://localhost:5173/`);
-    // mainWindow.loadURL(`https://www.fsse.vip/`);
+    mainWindow.loadURL(`http://localhost:5173/`);    
   } else {
     // 生产模式
     CustomScheme.registerScheme();
-    mainWindow.loadURL(`app://index.html`);   
+    mainWindow.loadURL(`app://index.html`);
   }
 
   CommonWindowEvent.listen();
@@ -119,10 +117,10 @@ function createWindow() {
 
 // 系统托盘
 function createTray() {
-  // 创建icon我这里使用的是一个png
-  const icon = nativeImage.createFromPath(
-    path.join(process.cwd(), "/resources/icons/16x16.png")
-  );
+  // 创建icon我这里使用的是一个png  
+  const iconPath =  app.isPackaged ? path.join(process.resourcesPath, 'icons', '16x16.png') : path.join(__dirname, '../resources/icons/16x16.png')
+
+  const icon = nativeImage.createFromPath(iconPath);
   // 实例化一个 托盘对象，传入的是托盘的图标
   const tray = new Tray(icon);
   // 移动到托盘上的提示
@@ -136,6 +134,9 @@ function createTray() {
     const tempate = [
       {
         label: "打开课堂评价",
+        click: () => {
+          mainWindow.show();
+        },
       },
       {
         label: "退出",

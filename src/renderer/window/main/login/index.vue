@@ -8,14 +8,17 @@
                 <div class="subtitle">大家一起互帮互评共提升</div>
                 <!--  -->
                 <div class="login_warper">
-                    <div class="login_img_warper">
+                    <div class="login_img_warper disabled-drag">
                         <img class="login_img" src="../../../assets/login-bg.png" alt="">
                     </div>
                     <!--  -->
                     <div v-if="state.step == 1" class="login_form_warper">
                         <!-- change -->
-                        <div class="change-type" @click="changeLoginType">
-                            <img class="change-type-img" src="../../../assets/icon-qrcode.png" alt="">
+                        <div class="change-type " @click="changeLoginType">
+                            <img class="change-type-img  disabled-drag" v-if="state.loginType === 'pwd'"
+                                src="../../../assets/icon-qrcode.png" alt="">
+                            <img class="change-type-img disabled-drag" v-else src="../../../assets/icon-erweima.png"
+                                alt="">
                         </div>
                         <!-- pwd -->
                         <div class="login-pwd" v-if="state.loginType === 'pwd'">
@@ -30,7 +33,8 @@
                                     <a-input-password v-model:value="formState.password" placeholder="请输入密码" />
                                 </a-form-item>
                                 <a-form-item>
-                                    <a-button :loading="state.loading" type="primary" html-type="submit" style="width: 100%;margin-top: 16px;">登录</a-button>
+                                    <a-button :loading="state.loading" type="primary" html-type="submit"
+                                        style="width: 100%;margin-top: 16px;">登录</a-button>
                                 </a-form-item>
                             </a-form>
                         </div>
@@ -43,7 +47,8 @@
                                     <view class="scan-corner top-right"></view>
                                     <view class="scan-corner bottom-left"></view>
                                     <view class="scan-corner bottom-right"></view>
-                                    <a-qrcode :value="state.qrcode" :size="110" :bordered="false" :status="state.qrcodeStatus" @refresh="generateQrCode"/>
+                                    <a-qrcode :value="state.qrcode" :size="110" :bordered="false"
+                                        :status="state.qrcodeStatus" @refresh="generateQrCode" />
                                 </div>
                             </div>
                             <div style="text-align: center;font-size: 12px;color: #666666;padding-top: 20px;">请用手机扫码登录
@@ -54,23 +59,24 @@
                     <div v-if="state.step == 2" class="login_form_warper">
                         <div class="login-pwd">
                             <div class="login-pwd-title">选择学校</div>
-                           
+
                             <div style="padding: 21px 20px 0 20px;">
                                 <!--  -->
                                 <div class="select-warp">
                                     <swiper class="swiper-container" :slides-per-view="3" :space-between="20"
-                                        :centered-slides="true"  @slideChange="onSlideChange"
-                                        @swiper="onSwiper" navigation :scrollbar="{ draggable: true }">
-                                        <swiper-slide @click="instanceSwiper?.slideToLoop(idx)" class="swiper-slide" v-for="(item,idx) in state.schoolList" :key="idx" v-slot="{ isActive }">
+                                        :centered-slides="true" @slideChange="onSlideChange" @swiper="onSwiper"
+                                        navigation :scrollbar="{ draggable: true }">
+                                        <swiper-slide @click="instanceSwiper?.slideToLoop(idx)" class="swiper-slide"
+                                            v-for="(item, idx) in state.schoolList" :key="idx" v-slot="{ isActive }">
                                             <img :src="item.schoolLogo" :style="{
                                                 width: '55px',
                                                 height: '55px',
                                                 borderRadius: '50%',
-                                                opacity:isActive?1:0.5
+                                                opacity: isActive ? 1 : 0.5
                                             }" alt="">
                                             <span :style="{
-                                                'padding-top':'7px',
-                                                'color':isActive ? '#000000' :'#8C8C8C'
+                                                'padding-top': '7px',
+                                                'color': isActive ? '#000000' : '#8C8C8C'
                                             }" class="ellipsis school-name">{{ item.schoolName }}</span>
                                         </swiper-slide>
                                     </swiper>
@@ -84,35 +90,40 @@
                                     </div>
                                 </div>
                                 <!--  -->
-                                <a-button type="primary" style="width: 100%;" :loading="state.loadingSchool" @click="handleLogin">登录</a-button>
-                                <a-button type="link" style="margin-left: -15px;margin-top: 5px;" @click="handleBack">返回</a-button>
+                                <a-button type="primary" style="width: 100%;" :loading="state.loadingSchool"
+                                    @click="handleLogin">登录</a-button>
+                                <a-button type="link" style="margin-left: -15px;margin-top: 5px;"
+                                    @click="handleBack">返回</a-button>
                             </div>
                         </div>
                     </div>
                 </div>
+                <!--  -->
+                <div class="version">v:{{ version }}</div>
             </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { reactive, onMounted,ref,onUnmounted } from 'vue'
+import { reactive, onMounted, ref, onUnmounted } from 'vue'
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import 'swiper/css';
 import { useRouter } from 'vue-router'
 import BarTop from '../../../components/BarTop/index.vue'
 import http from "../../../utils/http"
-import {useUserInfoStore} from "../../../store/useStore"
+import { useUserInfoStore } from "../../../store/useStore"
 
-// import { version } from '../../../../../package.json'
-// console.log(version)
+import { version } from '../../../../../package.json'
 
 const userInfo = useUserInfoStore()
 const router = useRouter()
 
 const formState = reactive({
-    username: '14788880091',
-    password: '123456t.',
+    // username: '14788880091',
+    // password: '123456t.',
+    username: '',
+    password: '',
     grant_type: 'password',
     client_id: 'yide-eac-windows',
     client_secret: 'yide1234567',
@@ -121,30 +132,30 @@ const formState = reactive({
 const state = reactive({
     step: 1,
     loading: false,
-    loadingSchool:false,
-    user:{},
+    loadingSchool: false,
+    user: {},
     schoolList: [],
-    current:0,
+    current: 0,
     loginType: 'pwd', // pwd | qrcode
     qrcode: '',
-    qrcodeStatus:'loading',
-    random:''
+    qrcodeStatus: 'loading',
+    random: ''
 })
 
 let instanceSwiper = null
 
-function handleLogin(){
+function handleLogin() {
     const school = state.schoolList[state.current]
     state.loadingSchool = true
-    if(school){
-        http.get(`/cloud/menu/checkUserLogin?schoolId=${school.id}`).then(()=>{
+    if (school) {
+        http.get(`/cloud/menu/checkUserLogin?schoolId=${school.id}`).then(() => {
             userInfo.setupUserInfo(state.user)
             router.push('/windowMain/home')
             state.step = 1
-        }).finally(()=>{
+        }).finally(() => {
             state.loadingSchool = false
         })
-    } 
+    }
 }
 
 const onSwiper = (swiper) => {
@@ -152,9 +163,9 @@ const onSwiper = (swiper) => {
 };
 const onSlideChange = (e) => {
     state.current = e.activeIndex
-    console.log('slide change',e.activeIndex);
+    console.log('slide change', e.activeIndex);
 };
-function changeSchool(type){
+function changeSchool(type) {
     if (type === 'next') {
         instanceSwiper.slideNext();
     } else {
@@ -162,7 +173,7 @@ function changeSchool(type){
     }
 }
 
-function handleBack(){
+function handleBack() {
     state.step = 1
 }
 
@@ -173,47 +184,47 @@ function sleep(ms) {
 }
 
 
-async function watchAuthQrCode(){
-        if(state.loginType == 'pwd')return;
-        await sleep(1000);
-        http.get(`/auth/qrcode/check?random=${state.random}`).then(async res=>{
-            const {expiresIn,status,ticket} = res.data
-            // ['未扫码', '已扫码', '已过期', '已授权', '取消授权'],
-            if(status==0){
-                await sleep(1000);
-                watchAuthQrCode()
-            }
-            if(expiresIn<=0 || status ==2){
-                state.qrcodeStatus = 'expired'               
-            }
-            if(status==1){                
-               state.qrcodeStatus = 'scanned'
-               await sleep(1000);
-               watchAuthQrCode()
-            }
-            if(status==3){
-               submitLogin(JSON.parse(ticket))
-            }
-            if(status==4){
-                state.qrcodeStatus = 'expired'
-            }
-        }).catch(async ()=>{
+async function watchAuthQrCode() {
+    if (state.loginType == 'pwd') return;
+    await sleep(1000);
+    http.get(`/auth/qrcode/check?random=${state.random}`).then(async res => {
+        const { expiresIn, status, ticket } = res.data
+        // ['未扫码', '已扫码', '已过期', '已授权', '取消授权'],
+        if (status == 0) {
             await sleep(1000);
             watchAuthQrCode()
-        })
+        }
+        if (expiresIn <= 0 || status == 2) {
+            state.qrcodeStatus = 'expired'
+        }
+        if (status == 1) {
+            state.qrcodeStatus = 'scanned'
+            await sleep(1000);
+            watchAuthQrCode()
+        }
+        if (status == 3) {
+            submitLogin(JSON.parse(ticket))
+        }
+        if (status == 4) {
+            state.qrcodeStatus = 'expired'
+        }
+    }).catch(async () => {
+        await sleep(1000);
+        watchAuthQrCode()
+    })
 }
 
-function generateQrCode(){
+function generateQrCode() {
     state.qrcodeStatus = 'loading'
-    http.get(`/auth/qrcode/gene`).then(async res=>{
-        const {expiresIn,qrCodeScannedUrl,random} = res.data
+    http.get(`/auth/qrcode/gene`).then(async res => {
+        const { expiresIn, qrCodeScannedUrl, random } = res.data
         state.qrcode = qrCodeScannedUrl
         state.qrcodeStatus = 'active'
-        state.random = random        
+        state.random = random
         watchAuthQrCode()
-    }).catch(()=>{
-            
-    }).finally(()=>{
+    }).catch(() => {
+
+    }).finally(() => {
 
     })
 }
@@ -227,7 +238,7 @@ function changeLoginType() {
     }
 }
 
-function submitLogin(params){
+function submitLogin(params) {
     state.loading = true
     http.postForm('/auth/oauth/token', params).then(async (res) => {
         const { accessToken, refreshToken } = res.data
@@ -268,7 +279,7 @@ const onFinishFailed = (errorInfo) => {
 };
 
 onMounted(() => {
-    
+
 })
 
 
@@ -294,6 +305,17 @@ onMounted(() => {
             justify-content: center;
             align-items: center;
             font-family: AlibabaPuHuiTiM;
+            position: relative;
+
+            .version {
+                position: absolute;
+                left: 50%;
+                bottom: 10px;
+                display: inline-block;
+                transform: translateX(-50%);
+                font-size: 12px;
+                color: #666666;
+            }
 
             .title {
                 font-size: 38px;
@@ -320,12 +342,12 @@ onMounted(() => {
 
         .login_img_warper {
             height: 281px;
-            width: 267px;
+            width: 267px;           
 
             .login_img {
                 height: 100%;
                 width: 100%;
-                display: block;
+                display: block;               
             }
         }
 
@@ -421,29 +443,33 @@ onMounted(() => {
         }
     }
 
-    .select-warp{
+    .select-warp {
         position: relative;
         margin-bottom: 20px;
         padding: 0 10px;
-        .prev{
+
+        .prev {
             position: absolute;
             left: -16px;
             top: 40%;
             transform: translateY(-50%);
             cursor: pointer;
-            img{
+
+            img {
                 width: 24px;
                 height: 24px;
                 display: block;
             }
         }
-        .next{
+
+        .next {
             position: absolute;
             right: -16px;
             top: 40%;
             transform: translateY(-50%);
             cursor: pointer;
-            img{
+
+            img {
                 width: 24px;
                 height: 24px;
                 display: block;
@@ -478,7 +504,7 @@ onMounted(() => {
         transform: scale(0.8);
         cursor: pointer;
 
-        .school-name{
+        .school-name {
             max-width: 72px;
         }
     }
@@ -486,6 +512,6 @@ onMounted(() => {
     .swiper-slide-active,
     .swiper-slide-duplicate-active {
         transform: scale(1);
-    }   
+    }
 }
 </style>

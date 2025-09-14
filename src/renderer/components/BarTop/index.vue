@@ -7,19 +7,19 @@
             <slot name="right">
 
             </slot>            
-            <div @click="minimizeMainWindow" title="最小化">
-                <i class="iconfont icon-zuixiaohua" />
+            <div @click="minimizeMainWindow" title="最小化">                
+                <MinusOutlined />
             </div>           
             <template v-if="!hideMaximized">
-                <div v-if="isMaximized" @click="unmaximizeMainWindow" title="向下还原">
-                    <i class="iconfont icon-window-restore" />
+                <div v-if="isMaximized" @click="unmaximizeMainWindow" title="向下还原" style="display: flex;align-items: center;justify-content: center;">
+                    <img src="../../assets/border-sx.png" alt="" class="disabled-drag" style="width: 17px;height: 17px;display: block;position: relative;top: -2px;">
                 </div>
-                <div v-else @click="maxmizeMainWin" title="最大化">
-                    <i class="iconfont  icon-square" />
+                <div v-else @click="maxmizeMainWin" title="最大化" style="display: flex;align-items: center;justify-content: center;">
+                    <img src="../../assets/border.png" alt="" class="disabled-drag" style="width: 16px;height: 16px;display: block;position: relative;top: -2px;">
                 </div>
             </template>
             <div @click="closeWindow" title="关闭">
-                <i class="iconfont icon-close" />
+                <CloseOutlined />
             </div>
         </div>
     </div>
@@ -27,10 +27,15 @@
 
 
 <script setup lang="ts">
-import { onMounted, ref, onUnmounted } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { ipcRenderer } from 'electron'
+import { MinusOutlined ,CloseOutlined} from '@ant-design/icons-vue';
+import { useUserInfoStore } from "../../store/useStore"
+const userInfo = useUserInfoStore()
+
 defineProps<{ title?: string, hideMaximized?:boolean }>()
-let isMaximized = ref(false)
+
+const isMaximized = computed(()=> userInfo.getIsMaximized)
 
 let isTop = ref(false)
 
@@ -46,29 +51,14 @@ let minimizeMainWindow = () => {
 let unmaximizeMainWindow = () => {
     ipcRenderer.invoke('unmaximizeWindow')
 }
-let winMaximizeEvent = () => {
-    isMaximized.value = true
-}
-let winUnmaximizeEvent = () => {
-    isMaximized.value = false
-}
+
 
 const topping = () => {
     ipcRenderer.invoke('topping').then(top=>{            
         isTop.value = top
     }) 
-
-    
 }
 
-onMounted(() => {
-    ipcRenderer.on('windowMaximized', winMaximizeEvent)
-    ipcRenderer.on('windowUnmaximized', winUnmaximizeEvent)
-})
-onUnmounted(() => {
-    ipcRenderer.off('windowMaximized', winMaximizeEvent)
-    ipcRenderer.off('windowUnmaximized', winUnmaximizeEvent)
-})
 </script>
 
 <style scoped lang="less">
