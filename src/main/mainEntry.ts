@@ -82,7 +82,7 @@ function createWindow() {
   };
 
   ipcMain.on("UpdaterCheck", (_, data) => {
-    if (data == "development") {
+    if (data != "development") {
       mainWindow.webContents.send("console", "生产环境,检测更新");
       UpdaterCheck();
       timer = setInterval(() => {
