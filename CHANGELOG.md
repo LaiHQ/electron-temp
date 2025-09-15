@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.8](https://github.com/LaiHQ/electron-temp/compare/v1.0.7...v1.0.8) (2025-09-15)
+
+
+### Bug Fixes
+
+* 修改bug ([32f1805](https://github.com/LaiHQ/electron-temp/commit/32f1805a6c9d4da66593e04dd94341a7d37a338a))
+* 修改bug ([9c9ab9f](https://github.com/LaiHQ/electron-temp/commit/9c9ab9f30cbe3c12e1aad6cfb3c21863efa5db5e))
+
 ### [1.0.7](https://github.com/LaiHQ/electron-temp/compare/v1.0.6...v1.0.7) (2025-09-15)
 
 ### [1.0.6](https://github.com/LaiHQ/electron-temp/compare/v1.0.5...v1.0.6) (2025-09-15)
