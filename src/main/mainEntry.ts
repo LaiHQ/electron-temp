@@ -3,8 +3,8 @@
  * @version: 1.0.0
  * @Author: lai_hq@qq.com
  * @Date: 2022-12-12 16:14:48
- * @LastEditors: lai_hq@qq.com
- * @LastEditTime: 2022-12-23 17:53:19
+ * @LastEditors: lhq
+ * @LastEditTime: 2025-09-15 22:08:29
  */
 import {
   app,
@@ -70,19 +70,12 @@ function createWindow() {
   const UpdaterCheck = () => {
     Updater.check((res: any) => {
       timer && clearInterval(timer);
-      // mainWindow.webContents.send('updateApp', res)
-      if (res.type == "updateAvailable") {
-        mainWindow.webContents.send("updateAppAuto", { type: "1", data: res });
-      } else if (res.type == "updateDownloadedEnd") {
-        mainWindow.webContents.send("updateAppAuto", { type: "0", data: res });
-      } else if (res.type == "updateProgress") {
-        mainWindow.webContents.send("updateAppAuto", { type: "2", data: res });
-      }
+      mainWindow.webContents.send('updateApp', res)
     });
   };
 
   ipcMain.on("UpdaterCheck", (_, data) => {
-    if (data != "development") {
+    if (data !== "development") {
       mainWindow.webContents.send("console", "生产环境,检测更新");
       UpdaterCheck();
       timer = setInterval(() => {
@@ -115,7 +108,7 @@ function createWindow() {
 // 系统托盘
 function createTray() {
   // 创建icon我这里使用的是一个png  
-  const iconPath =  app.isPackaged ? path.join(process.resourcesPath, 'icons', '16x16.png') : path.join(__dirname, '../resources/icons/16x16.png')
+  const iconPath = app.isPackaged ? path.join(process.resourcesPath, 'icons', '16x16.png') : path.join(__dirname, '../resources/icons/16x16.png')
 
   const icon = nativeImage.createFromPath(iconPath);
   // 实例化一个 托盘对象，传入的是托盘的图标
@@ -197,8 +190,9 @@ function showLoading(cb: Function) {
 
 app.on("ready", () => {
   // showLoading(createWindow)  
-  console.log(`🔍 Electron Version`,process.versions.electron) 
-  console.log('🔍 App Version:', app.getVersion()); 
+  // app.setVersion('1.0.0');
+  console.log(`🔍 Electron Version`, process.versions.electron)
+  console.log('🔍 App Version:', app.getVersion());
   console.log('🔍 App Path:', app.getAppPath());
   createWindow();
 });

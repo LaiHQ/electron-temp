@@ -20,7 +20,7 @@ ipcMain.handle('update-downloaded', (e) => {
 export class Updater {
   static check(cb: Function) {
     //设置是否自动下载
-    autoUpdater.autoDownload = true
+    autoUpdater.autoDownload = false
     autoUpdater.autoInstallOnAppQuit = true
     if (process.env.NODE_ENV === 'development') {
       // console.log('✅ 当前应用版本:', app.getVersion());
@@ -49,10 +49,10 @@ export class Updater {
     // 如果此文件中的版本号比当前版本号新，则下载新版本，否则就退出更新逻辑。
     // 下载完成
     autoUpdater.on('update-downloaded', async (data) => {
-      console.log('_下载完成__',data)
-      setTimeout(() => {
-        autoUpdater.quitAndInstall(true, true)
-      }, 3000)
+      console.log('_下载完成__', data)
+      // setTimeout(() => {
+      //   autoUpdater.quitAndInstall(true, true)
+      // }, 3000)
       // 有可用的升级
       cb({
         type: 'updateDownloadedEnd',

@@ -152,9 +152,9 @@ function msgHandler({ type, data }) {
   console.log('versionData', data);
 
   //目前都为强制更新， 下载完成直接安装
-  if (state.updateProgress.percent == 100) {
-    handleUpdate('update');
-  }
+  // if (state.updateProgress.percent == 100) {
+  //   handleUpdate('update');
+  // }
 
   if (data.type !== 'updateAvailable') {
     state.status = data.type;
@@ -164,8 +164,7 @@ function msgHandler({ type, data }) {
 
 onMounted(() => {  
   window.addEventListener('message', msgHandler);
-  dialogReady();
-  
+  dialogReady();  
 });
 </script>
 

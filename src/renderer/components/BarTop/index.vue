@@ -22,6 +22,7 @@
                 <CloseOutlined />
             </div>
         </div>
+        <!--  -->       
     </div>
 </template>
 
@@ -30,6 +31,7 @@
 import { onMounted, ref, computed } from 'vue'
 import { ipcRenderer } from 'electron'
 import { MinusOutlined ,CloseOutlined} from '@ant-design/icons-vue';
+
 import { useUserInfoStore } from "../../store/useStore"
 const userInfo = useUserInfoStore()
 
