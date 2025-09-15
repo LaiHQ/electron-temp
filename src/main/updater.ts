@@ -6,6 +6,7 @@ import path from 'path'
 // autoUpdater.allowPrerelease = false;
 // autoUpdater.allowDowngrade = false;
 
+
 // 安装
 ipcMain.handle('update-version', (e) => {
   autoUpdater.quitAndInstall()
@@ -18,7 +19,7 @@ ipcMain.handle('update-downloaded', (e) => {
 
 // 全量升级
 export class Updater {
-  static check(cb: Function) {
+  static check(cb: Function) {    
     //设置是否自动下载
     autoUpdater.autoDownload = true
     autoUpdater.autoInstallOnAppQuit = true
@@ -27,6 +28,8 @@ export class Updater {
       // console.log('✅ Electron 版本:', process.versions.electron);
       // console.log('✅ 是否打包:', app.isPackaged);
       // console.log('✅ 更新配置路径:', autoUpdater.updateConfigPath);
+      // autoUpdater.forceDevUpdateConfig = true
+   
 
       Object.defineProperty(app, 'isPackaged', {
         get() {

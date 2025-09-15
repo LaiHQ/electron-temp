@@ -82,7 +82,7 @@ function createWindow() {
   };
 
   ipcMain.on("UpdaterCheck", (_, data) => {
-    if (data != "development") {
+    if (data == "development") {
       mainWindow.webContents.send("console", "生产环境,检测更新");
       UpdaterCheck();
       timer = setInterval(() => {
@@ -197,6 +197,7 @@ function showLoading(cb: Function) {
 
 app.on("ready", () => {
   // showLoading(createWindow)  
+  app?.setVersion('1.0.0');
   console.log(`🔍 Electron Version`,process.versions.electron) 
   console.log('🔍 App Version:', app.getVersion()); 
   console.log('🔍 App Path:', app.getAppPath());
