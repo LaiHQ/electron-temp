@@ -122,10 +122,10 @@ const userInfo = useUserInfoStore()
 const router = useRouter()
 
 const formState = reactive({
-    username: '14788880091',
-    password: '123456t.',
-    // username: '',
-    // password: '',
+    // username: '14788880091',
+    // password: '123456t.',
+    username: '',
+    password: '',
     grant_type: 'password',
     client_id: 'yide-eac-windows',
     client_secret: 'yide1234567',
