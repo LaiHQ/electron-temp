@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.1](https://github.com/LaiHQ/electron-temp/compare/v1.0.10...v1.0.1) (2025-09-15)
+
 ### [1.0.10](https://github.com/LaiHQ/electron-temp/compare/v1.0.9...v1.0.10) (2025-09-15)
 
 ### [1.0.9](https://github.com/LaiHQ/electron-temp/compare/v1.0.7...v1.0.9) (2025-09-15)
