@@ -65,11 +65,11 @@
                 <div :class="`banner banner_${state.activeKey}`"></div>
                 <div class="header">
                     <div class="header_item" :class="{
-                        'header_item__active': checkedSchool
-                    }" @click="handleSchoolRanking(true)">全校排名</div>
-                    <div class="header_item" :class="{
                         'header_item__active': !checkedSchool
                     }" @click="handleSchoolRanking(false)">本班排名</div>
+                    <div class="header_item" :class="{
+                        'header_item__active': checkedSchool
+                    }" @click="handleSchoolRanking(true)">全校排名</div>                    
                 </div>
                 <div class="list_warper" ref="listRef" :key="state.updateKey">
                     <!-- 列表 -->
@@ -170,9 +170,9 @@ const state = reactive({
     dataList: [],
     clientHeight: 514,
     pageNo: 1,
-    checkedSchool1: true,
-    checkedSchool2: true,
-    checkedSchool3: true,
+    checkedSchool1: false,
+    checkedSchool2: false,
+    checkedSchool3: false,
 });
 
 const checkedSchool = computed(() => {
@@ -313,7 +313,7 @@ function handleScroll(e) {
         debounce(() => {
             if (!loading.value && hasMore.value) {
                 console.log("load");
-                fetchData(1);
+                fetchData(state.activeKey);
             }
         }, 300);
     }

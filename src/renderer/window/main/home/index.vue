@@ -163,9 +163,13 @@
             </div>
         </div>
     </div>
+    <!--  -->
+    <StartUpdate />
+    <!--  -->
 </template>
 
 <script setup>
+
 import { nextTick, onMounted, reactive, ref, createVNode, computed, watch } from "vue"
 import { CheckOutlined, CaretDownOutlined, WarningOutlined } from "@ant-design/icons-vue"
 import BarTop from '../../../components/BarTop/index.vue'
@@ -175,6 +179,10 @@ import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
 
 import { useUserInfoStore } from "../../../store/useStore"
 import http from "../../../utils/http";
+import StartUpdate from "../../../components/startUpdate/index.vue"
+
+
+
 
 const userInfo = useUserInfoStore()
 const user = computed(() => userInfo.getUser)
@@ -395,6 +403,8 @@ onMounted(async () => {
         }).catch(() => {
             spinningMedal.value = false
         })
+
+        
     })
 })
 

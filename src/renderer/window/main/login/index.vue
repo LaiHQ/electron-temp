@@ -102,6 +102,8 @@
                 <div class="version">v:{{ version }}</div>
             </div>
         </div>
+        <!--  -->
+        
     </div>
 </template>
 
@@ -113,17 +115,17 @@ import { useRouter } from 'vue-router'
 import BarTop from '../../../components/BarTop/index.vue'
 import http from "../../../utils/http"
 import { useUserInfoStore } from "../../../store/useStore"
-
 import { version } from '../../../../../package.json'
+
 
 const userInfo = useUserInfoStore()
 const router = useRouter()
 
 const formState = reactive({
-    username: '14788880091',
-    password: '123456t.',
-    // username: '',
-    // password: '',
+    // username: '14788880091',
+    // password: '123456t.',
+    username: '',
+    password: '',
     grant_type: 'password',
     client_id: 'yide-eac-windows',
     client_secret: 'yide1234567',
