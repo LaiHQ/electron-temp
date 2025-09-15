@@ -19,6 +19,7 @@ export let devPlugin = () => {
         outfile: "./dist/mainEntry.js",
         external: ["electron"],
       });
+
       server.httpServer.once("listening", () => {
         let { spawn } = require("child_process");
         let addressInfo = server.httpServer.address();

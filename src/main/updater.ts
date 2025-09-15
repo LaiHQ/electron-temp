@@ -1,16 +1,10 @@
-/*
- * @Descripttion:
- * @version: 1.0.0
- * @Author: lai_hq@qq.com
- * @Date: 2022-12-15 11:19:31
- * @LastEditors: lai_hq@qq.com
- * @LastEditTime: 2023-02-15 09:59:29
- */
 import { ipcMain, app } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import path from 'path'
 
-import { version } from '../../package.json'
+// 👇 允许开发环境检查更新
+// autoUpdater.allowPrerelease = false;
+// autoUpdater.allowDowngrade = false;
 
 // 安装
 ipcMain.handle('update-version', (e) => {
@@ -29,6 +23,11 @@ export class Updater {
     autoUpdater.autoDownload = true
     autoUpdater.autoInstallOnAppQuit = true
     if (process.env.NODE_ENV === 'development') {
+      // console.log('✅ 当前应用版本:', app.getVersion());
+      // console.log('✅ Electron 版本:', process.versions.electron);
+      // console.log('✅ 是否打包:', app.isPackaged);
+      // console.log('✅ 更新配置路径:', autoUpdater.updateConfigPath);
+
       Object.defineProperty(app, 'isPackaged', {
         get() {
           return true
@@ -38,20 +37,19 @@ export class Updater {
         __dirname,
         '../dev-app-update.yml'
       )
-      // console.log(autoUpdater)
     }
 
     // 检查更新
     console.log(`开始检查更新`)
     autoUpdater.checkForUpdates().catch((err) => {
-      console.log('网络连接问题', err)     
-      
+      console.log('网络连接问题', err)
     })
     // 当 autoUpdater.checkForUpdates() 方法执行时，
-    // 应用会先请求 release目录下 这个 yml 文件，得到文件里的内容后，再拿此文件中的版本号与当前版本号对比，
+    // 应用会先请求 release 目录下 这个 yml 文件，得到文件里的内容后，再拿此文件中的版本号与当前版本号对比，
     // 如果此文件中的版本号比当前版本号新，则下载新版本，否则就退出更新逻辑。
     // 下载完成
     autoUpdater.on('update-downloaded', async (data) => {
+      console.log('_下载完成__',data)
       setTimeout(() => {
         autoUpdater.quitAndInstall(true, true)
       }, 3000)

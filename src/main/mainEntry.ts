@@ -17,16 +17,13 @@ import {
   dialog,
   ipcMain
 } from "electron";
-
 import path from "path";
-
 import { CustomScheme } from "./customScheme";
-
 import { CommonWindowEvent } from "./commonWindowEvent";
-
 import { Updater } from "./updater";
-
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = "true";
+
+import { version } from '../../package.json'
 
 //崩溃报告 当应用程序崩溃时，就会产生一个.dmp 扩展名结尾的文件（存放于 C:\Users\[yourOsUserName]\AppData\Roaming\[yourAppName]\Crashpad
 crashReporter.start({ submitURL: "", uploadToServer: false });
@@ -99,7 +96,7 @@ function createWindow() {
     // mainWindow.setSimpleFullScreen(true)
     // console.log("process.argv[2]",process.argv)
     // mainWindow.loadURL(process.argv[2]);
-    mainWindow.loadURL(`http://localhost:5173/`);    
+    mainWindow.loadURL(`http://localhost:5173/`);
   } else {
     // 生产模式
     CustomScheme.registerScheme();
@@ -199,7 +196,9 @@ function showLoading(cb: Function) {
 }
 
 app.on("ready", () => {
-  // showLoading(createWindow)
-  console.log('__ready__')
+  // showLoading(createWindow)  
+  console.log(`🔍 Electron Version`,process.versions.electron) 
+  console.log('🔍 App Version:', app.getVersion()); 
+  console.log('🔍 App Path:', app.getAppPath());
   createWindow();
 });

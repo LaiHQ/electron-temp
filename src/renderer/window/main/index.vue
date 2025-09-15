@@ -63,7 +63,7 @@ onMounted(() => {
             return;
           }
         });
-    },6000)    
+    },3000)    
 })
 </script>
 

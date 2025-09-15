@@ -59,7 +59,8 @@ class BuildObj {
         },
         files: ['**'],
         extends: null,
-        productName: process.env.NODE_ENV == 'uat' ? '课堂评价' : "课堂评价", //项目名，也是生成的安装文件名，即aDemo.exe
+        productName: "课堂评价", //项目名，也是生成的安装文件名，即aDemo.exe
+        artifactName: "${name}-${version}-${arch}.${ext}",
         appId: 'com.ydktpjapp.desktop',
         copyright: 'Copyright © 2025', //版权信息
         asar: true,
@@ -95,7 +96,7 @@ class BuildObj {
           // 要把 release 目录下的[your_project_name] Setup [your_project_version].exe 和 latest.yml 两个文件上传到第 1 点中指定的服务器地址下（这是 Windows 平台下的工作）。
           // Mac 平台下要把 release 目录下的[your_project_name]-[your_project_version]-mac.zip、[your_project_name]-[your_project_version].dmg 和 latest-mac.yml 三个文件上传到指定的服务器地址下。
           // { provider: "generic", url: "http://localhost:8000/" }
-          { provider: 'generic', url: 'https://file.1d1j.cn/' },
+          { provider: 'generic', url: 'https://file.1d1j.cn/desktop/ydktpjapp/' },
         ],
 
         // extraResources可以让开发者为安装包指定额外的资源文件，electron-builder

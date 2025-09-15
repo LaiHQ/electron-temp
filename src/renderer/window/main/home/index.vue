@@ -63,7 +63,7 @@
                     <div class="list_item__warper" :style="{ height: state.clientHeight + 'px' }">
                         <a-spin :spinning="spinningStudent">
                             <div class="list_item" :style="{
-                                width: `${state.clientWidth > 1200 ? 20 : 25}%`
+                                width: `${state.clientWidth > 1200 ? 16.6 : 25}%`
                             }" v-for="(item, idx) in state.dataList" :key="idx" @click="handleSelectStudent(item)">
                                 <div class="item_content" :class="{
                                     active: state.checkedStudentList.includes(item.id)
@@ -98,12 +98,17 @@
                     <!--  -->
                     <div class="list_item__warper">
                         <a-spin :spinning="spinningMedal">
-                            <div class="select_desc">已选择 <span style="font-size: 16px;">{{
-                                state.checkedStudentList.length
-                                    }}</span> 位同学，快给他们发送勋章吧～</div>
-                            <div class="list_item__box" :style="{ height: (state.clientHeight - 80) + 'px' }">
+                            <div style="padding: 0 12px;">
+                                <a-tabs v-model:activeKey="currentMedalType" @change="changeTabs">
+                                    <a-tab-pane key="-1" tab="全部"></a-tab-pane>
+                                    <a-tab-pane :key="item.id" :tab="item.name"
+                                        v-for="item in evalMedalType"></a-tab-pane>
+                                </a-tabs>
+                            </div>
+
+                            <div class="list_item__box" :style="{ height: (state.clientHeight - 100) + 'px' }">
                                 <div class="list_item" :style="{
-                                    width: `${state.clientWidth > 1200 ? 20 : 25}%`
+                                    width: `${state.clientWidth > 1200 ? 16.6 : 25}%`
                                 }" v-for="(item, idx) in state.evalMedalList" :key="idx"
                                     @click="handleSelectMedal(item)">
                                     <!--  -->
@@ -113,7 +118,7 @@
                                         <div class="item_content__active">
                                             <CheckOutlined style="color:#fff;font-size: 10px;" />
                                         </div>
-                                        <div class="item_img">
+                                        <div class="item_img disabled-drag">
                                             <img :src="item.medalIconUrl" alt="">
                                         </div>
                                         <div class="ellipsis item_name">{{ item.medalName }}</div>
@@ -129,17 +134,28 @@
                                     <template #description>
                                         <span>
                                             暂无数据！
-                                            <a href="javascript:;" @click="getPageEvalMedal">重新加载</a>
+                                            <a href="javascript:;" @click="getPageEvalMedal(currentMedalType)">重新加载</a>
                                         </span>
                                     </template>
                                 </a-empty>
                             </div>
 
-                            <div style="padding-top: 10px;text-align: center;">
-                                <a-button @click="submit"
-                                    :disabled="!(state.checkedStudentList.length > 0 && state.checkedMedalList.length > 0)"
-                                    :loading="subLoading" type="primary"
-                                    style="border-radius: 16px;width: 160px;">确定发放</a-button>
+                            <div
+                                style="padding-top: 10px;display: flex;align-items: center;justify-content: space-between;">
+                                <div class="select_desc ellipsis">已选择 <span style="font-size: 16px;color:#F5222D">{{
+                                    state.checkedStudentList.length
+                                        }}</span> 位同学，快给他们发送勋章吧～</div>
+
+                                <div style="display: flex;align-items: center;">
+                                    <a-button @click="clearCheck" :disabled="!(state.checkedStudentList.length > 0 || state.checkedMedalList.length > 0)" style="border-radius: 16px;">重置</a-button>
+                                    <a-popconfirm :disabled="!(state.checkedStudentList.length > 0 && state.checkedMedalList.length > 0)" title="确定发放?" @confirm="submit">
+                                        <a-button
+                                            :disabled="!(state.checkedStudentList.length > 0 && state.checkedMedalList.length > 0)"
+                                            :loading="subLoading" type="primary"
+                                            style="border-radius: 16px;width: 160px;margin-left: 11px;">确定发放</a-button>
+                                    </a-popconfirm>
+                                </div>
+
                             </div>
                         </a-spin>
                     </div>
@@ -164,6 +180,16 @@ const userInfo = useUserInfoStore()
 const user = computed(() => userInfo.getUser)
 const classMaterList = computed(() => userInfo.getClassMaterList)
 const selectClass = computed(() => userInfo.getCurrentClass)
+const evalMedalType = computed(() => userInfo.getEvalMedalType)
+
+const currentMedalType = computed({
+    get() {
+        return userInfo.getCurrentMedalType?.id
+    },
+    set(key) {
+        userInfo.changeMedalType(key)
+    }
+})
 
 const dataListRef = ref(null)
 const spinningStudent = ref(true)
@@ -181,6 +207,21 @@ const state = reactive({
 })
 
 // https://app.apifox.com/project/2934512
+
+let timer = null;
+const debounce = (func, delay) => {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(func, delay);
+};
+
+function changeTabs(id) {
+    debounce(() => {
+        getPageEvalMedal(id)
+    }, 300)
+}
+
+
+
 
 function openRanking() {
     console.log('openRanking');
@@ -201,17 +242,24 @@ function submit() {
         medalCodeList,
         personListDTO
     }
+    message.config({
+        top: `100px`
+    })
     http.post(`/app/appEvalMedal/person/issuanceMedal`, p).then(res => {
         if (res.data) {
             state.checkedStudentList = []
             state.checkedMedalList = []
             getAllStudents()
         }
-
         message.success(res.message)
     }).finally(() => {
         subLoading.value = false
     })
+}
+
+function clearCheck(){
+    state.checkedStudentList = []
+    state.checkedMedalList = []
 }
 
 
@@ -234,16 +282,21 @@ function handleSelectMedal({ id }) {
     }
 }
 
-
-function getPageEvalMedal() {
+function getPageEvalMedal(id) {
     spinningMedal.value = true
-    http.post('/cloud/evalMedal/pageEvalMedal', {
+    const p = {
         issuanceMethod: 2,
         medalList: [],
         medalStatus: 1,
         pageNo: 1,
-        pageSize: 999
-    }).then(res => {
+        pageSize: 999,
+        medalTypeId: id || currentMedalType.value
+    }
+
+    if (p.medalTypeId == '-1') {
+        delete p.medalTypeId
+    }
+    http.post('/cloud/evalMedal/pageEvalMedal', p).then(res => {
         const { list } = res.data
         state.evalMedalList = list
     }).finally(() => {
@@ -336,7 +389,12 @@ onMounted(async () => {
 
     nextTick(() => {
         getAllStudents()
-        getPageEvalMedal()
+
+        userInfo.queryPageEvalMedalType((id) => {
+            getPageEvalMedal(id)
+        }).catch(() => {
+            spinningMedal.value = false
+        })
     })
 })
 
@@ -469,19 +527,19 @@ onMounted(async () => {
                     padding-left: -6px;
                     overflow-y: scroll;
 
-                    .list_item {
-                        &:hover {
-                            .item_content {
-                                border: 2px solid #FF9433;
-                                transition: all 0.23s;
-                            }
+                    // .list_item {
+                    //     &:hover {
+                    //         .item_content {
+                    //             border: 2px solid #FF9433;
+                    //             transition: all 0.23s;
+                    //         }
 
-                            .item_content__active {
-                                background-color: #FF9433 !important;
-                                transition: all 0.23s;
-                            }
-                        }
-                    }
+                    //         .item_content__active {
+                    //             background-color: #FF9433 !important;
+                    //             transition: all 0.23s;
+                    //         }
+                    //     }
+                    // }
 
                     .item_content.active {
                         border: 2px solid #FF9433 !important;
@@ -536,8 +594,8 @@ onMounted(async () => {
 
                     .select_desc {
                         padding-left: 16px;
-                        padding-top: 10px;
-                        padding-bottom: 6px;
+                        // padding-top: 10px;
+                        // padding-bottom: 6px;
                         font-size: 13px;
                         color: #333333;
                     }
@@ -626,6 +684,10 @@ onMounted(async () => {
         left: 50%;
         top: 50%;
         transform: translate3d(-50%, -50%, 0);
+    }
+
+    :deep(.ant-tabs-nav) {
+        margin-bottom: 0 !important;
     }
 }
 </style>
