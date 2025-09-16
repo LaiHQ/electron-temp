@@ -1,10 +1,11 @@
 {
   "name": "ydktpjapp-desktop",
   "private": true,
-  "version": "0.0.3",
+  "version": "0.0.4",
   "scripts": {
     "dev": "vite",
     "build": "npm run release && vite build",
+    "build:test": "vite build --mode=mac",
     "build:win": "npm run release && vite build --mode=win",
     "build:mac": "npm run release && vite build --mode=mac",
     "build:linux": "npm run release && vite build --mode=linux",
