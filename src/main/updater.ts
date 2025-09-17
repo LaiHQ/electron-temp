@@ -9,7 +9,8 @@ import path from 'path'
 
 // 安装
 ipcMain.handle('update-version', (e) => {
-  autoUpdater.quitAndInstall()
+  console.log("--开始安装--")
+  autoUpdater.quitAndInstall(true, true)
 })
 
 // 下载
@@ -21,7 +22,7 @@ ipcMain.handle('update-downloaded', (e) => {
 export class Updater {
   static check(cb: Function) {    
     //设置是否自动下载
-    autoUpdater.autoDownload = false
+    autoUpdater.autoDownload = true
     autoUpdater.autoInstallOnAppQuit = true
     if (process.env.NODE_ENV === 'development') {
       // console.log('✅ 当前应用版本:', app.getVersion());
@@ -29,8 +30,6 @@ export class Updater {
       // console.log('✅ 是否打包:', app.isPackaged);
       // console.log('✅ 更新配置路径:', autoUpdater.updateConfigPath);
       // autoUpdater.forceDevUpdateConfig = true
-   
-
       Object.defineProperty(app, 'isPackaged', {
         get() {
           return true
@@ -40,6 +39,7 @@ export class Updater {
         __dirname,
         '../dev-app-update.yml'
       )
+      console.log('开发环境更新配置路径:', autoUpdater.updateConfigPath)
     }
 
     // 检查更新
@@ -85,8 +85,12 @@ export class Updater {
       })
     })
 
-    autoUpdater.on('error', function (error) {
-      console.log('出错')
+    autoUpdater.on('error', function (error:any) {
+      console.log('出错',error)
+      if (error.code === 2) {
+        console.log('文件定位失败，尝试清理缓存...');
+        // 这里可以添加清理缓存的逻辑
+      }
     })
   }
 }

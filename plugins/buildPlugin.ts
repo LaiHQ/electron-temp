@@ -78,8 +78,17 @@ class BuildObj {
           ],
         },
         mac:{   
-          icon: './resources/icons/icon.icns',       
-          target: "dmg",          
+          icon: './resources/icons/icon.icns',
+          target: [
+            {
+              "target": "dmg",  // 用于分发给新用户安装
+              "arch": ["arm64"]
+            },
+            {
+              "target": "zip",  // 用于自动更新
+              "arch": ["arm64"]
+            }
+          ],          
         },       
         nsis: {
           oneClick: false, //一键安装
@@ -95,7 +104,7 @@ class BuildObj {
           // 这个路径指向你的新版本安装包所在的服务器目录
           // 要把 release 目录下的[your_project_name] Setup [your_project_version].exe 和 latest.yml 两个文件上传到第 1 点中指定的服务器地址下（这是 Windows 平台下的工作）。
           // Mac 平台下要把 release 目录下的[your_project_name]-[your_project_version]-mac.zip、[your_project_name]-[your_project_version].dmg 和 latest-mac.yml 三个文件上传到指定的服务器地址下。
-          // { provider: "generic", url: "http://localhost:8000/" }
+          // { provider: "generic", url: "http://localhost:3000/" }
           { provider: 'generic', url: 'https://file.1d1j.cn/desktop/ydktpjapp/' },
         ],
 

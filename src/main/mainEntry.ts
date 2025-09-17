@@ -1,11 +1,3 @@
-/*
- * @Descripttion:
- * @version: 1.0.0
- * @Author: lai_hq@qq.com
- * @Date: 2022-12-12 16:14:48
- * @LastEditors: lhq
- * @LastEditTime: 2025-09-15 22:08:29
- */
 import {
   app,
   BrowserWindow,
@@ -190,9 +182,10 @@ function showLoading(cb: Function) {
 
 app.on("ready", () => {
   // showLoading(createWindow)  
-  // app.setVersion('1.0.0');
-  console.log(`🔍 Electron Version`, process.versions.electron)
-  console.log('🔍 App Version:', app.getVersion());
-  console.log('🔍 App Path:', app.getAppPath());
+  // app.setVersion('0.0.1');
+  // console.log(`🔍 Electron Version`, process.versions.electron)
+  // console.log('🔍 App Version:', app.getVersion());
+  // console.log('🔍 应用程序标识符:', app.getAppPath());
+  // console.log('Bundle ID:', app.name || process.execPath.match(/([^\/]+)\.app/)?.[1])
   createWindow();
 });

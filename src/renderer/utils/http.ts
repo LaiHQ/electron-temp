@@ -297,7 +297,7 @@ function toLogin() {
   try {
     window.localStorage.removeItem("token");
     router.replace({
-      path: "/user/login",
+      path: "/windowMain/login",
       query: {
         redirect: router.currentRoute?.fullPath,
       },
@@ -411,10 +411,15 @@ async function handleAuthError(config: AxiosRequestConfig, data: any) {
     //     toLogin();
     //   }, 1000);
     // }
-    tipMsg(msg);
+    // tipMsg(msg);
     setTimeout(() => {
         toLogin();
     }, 1000);
+  } else if([1002002024].includes(errorNumber)){
+    tipMsg(msg);
+    setTimeout(() => {
+        toLogin();
+    }, 1500);
   } else {
     tipMsg(msg);
   }

@@ -164,7 +164,7 @@
         </div>
     </div>
     <!--  -->
-    <StartUpdate />
+    <!-- <StartUpdate /> -->
     <!--  -->
 </template>
 
@@ -179,7 +179,7 @@ import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
 
 import { useUserInfoStore } from "../../../store/useStore"
 import http from "../../../utils/http";
-import StartUpdate from "../../../components/startUpdate/index.vue"
+// import StartUpdate from "../../../components/startUpdate/index.vue"
 
 
 
@@ -379,7 +379,9 @@ onMounted(async () => {
     }
     window.addEventListener('resize', () => {
         const arr = [...state.dataList]
+        const arr1 = [...state.evalMedalList]
         state.dataList = []
+        state.evalMedalList = []
         state.clientHeight = 0
         state.clientWidth = 0
         state.updateKey++
@@ -387,6 +389,7 @@ onMounted(async () => {
             state.clientHeight = dataListRef.value?.clientHeight
             state.clientWidth = dataListRef.value?.clientWidth
             state.dataList = arr
+            state.evalMedalList = arr1
         })
     })
 

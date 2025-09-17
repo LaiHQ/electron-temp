@@ -205,7 +205,13 @@ async function watchAuthQrCode() {
             watchAuthQrCode()
         }
         if (status == 3) {
-            submitLogin(JSON.parse(ticket))
+            try {
+                const json = JSON.parse(ticket)
+                console.log(json)
+                submitLogin(json)
+            } catch (error) {
+                console.log(error)
+            }
         }
         if (status == 4) {
             state.qrcodeStatus = 'expired'

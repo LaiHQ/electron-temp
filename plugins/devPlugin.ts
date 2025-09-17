@@ -1,13 +1,8 @@
-/*
- * @Descripttion: 
- * @version: 1.0.0
- * @Author: lai_hq@qq.com
- * @Date: 2022-12-12 16:15:42
- * @LastEditors: lai_hq@qq.com
- * @LastEditTime: 2022-12-14 11:51:34
- */
 
 import { ViteDevServer } from "vite";
+import path from 'path'
+import fs from 'fs-extra';
+
 export let devPlugin = () => {
   return {
     name: "dev-plugin",
@@ -18,7 +13,7 @@ export let devPlugin = () => {
         platform: "node",
         outfile: "./dist/mainEntry.js",
         external: ["electron"],
-      });
+      });      
 
       server.httpServer.once("listening", () => {
         let { spawn } = require("child_process");
@@ -31,9 +26,7 @@ export let devPlugin = () => {
         electronProcess.on("close", () => {
           server.close();
           process.exit();
-        });
-
-       
+        });       
       });
     },
   };

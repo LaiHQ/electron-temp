@@ -1,17 +1,16 @@
 {
   "name": "ydktpjapp-desktop",
   "private": true,
-  "version": "0.0.4",
+  "version": "0.0.6",
   "scripts": {
     "dev": "vite",
-    "build": "npm run release && vite build",
-    "build:test": "vite build --mode=mac",
+    "build:test": "vite build --mode=win",
     "build:win": "npm run release && vite build --mode=win",
     "build:mac": "npm run release && vite build --mode=mac",
     "build:linux": "npm run release && vite build --mode=linux",
     "build-icon": "electron-icon-builder --input=./resources/logo.png --output=resources --flatten",
     "release": "standard-version",
-    "rebuild": "electron-rebuild -f -w better-sqlite3"
+    "rebuild": "electron-rebuild -f -w better-sqlite3"    
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "4.0.0",
@@ -42,5 +41,5 @@
     "axios": "1.11.0",
     "qs": "6.14.0",
     "swiper": "11.2.10"
-  }
+  }  
 }
